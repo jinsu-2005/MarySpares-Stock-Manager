@@ -1,0 +1,25 @@
+*.iml
+.gradle
+/local.properties
+/.idea
+.idea/
+.DS_Store
+/build
+build/
+*/build/
+captures/
+.externalNativeBuild
+.cxx
+local.properties
+.agents/
+.vscode/
+.kotlin/
+
+# Firebase & Google Services credentials
+google-services.json
+app/google-services.json
+
+# Signing credentials
+*.keystore
+*.jks
+*.p12

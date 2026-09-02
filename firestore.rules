@@ -1,0 +1,85 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuth() {
+      return request.auth != null;
+    }
+
+    function userEmail() {
+      return isAuth() && request.auth.token.email != null ? request.auth.token.email.lower() : '';
+    }
+
+    function isRootAdmin() {
+      return isAuth() && userEmail() == 'jinsu.j2005@gmail.com';
+    }
+
+    function isRootOwner() {
+      return isAuth() && userEmail() == 'jinsukapgreen@gmail.com';
+    }
+
+    function hasUserDoc() {
+      return isAuth() && exists(/databases/$(database)/documents/users/$(request.auth.uid));
+    }
+
+    function getUserDoc() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+
+    function getUserRole() {
+      return isRootAdmin() ? 'ADMIN' :
+             isRootOwner() ? 'OWNER' :
+             hasUserDoc() ? getUserDoc().role : 'NONE';
+    }
+
+    function isActiveUser() {
+      return isAuth() && (
+        isRootAdmin() ||
+        isRootOwner() ||
+        (hasUserDoc() && getUserDoc().status == 'ACTIVE')
+      );
+    }
+
+    function isAdmin() {
+      return isAuth() && (isRootAdmin() || getUserRole() == 'ADMIN');
+    }
+
+    function isOwnerOrAdmin() {
+      return isAuth() && (isRootAdmin() || isRootOwner() || getUserRole() == 'ADMIN' || getUserRole() == 'OWNER');
+    }
+
+    function isMember() {
+      return isAuth() && isActiveUser() && getUserRole() in ['ADMIN', 'OWNER', 'STAFF', 'RELATIVE', 'FRIEND'];
+    }
+
+    // 1. Invitations & Whitelist
+    match /invitations/{email} {
+      allow read: if isAuth();
+      allow create, update: if isOwnerOrAdmin();
+      allow delete: if isOwnerOrAdmin();
+    }
+
+    // 2. User Profiles & Role Bindings
+    match /users/{userId} {
+      allow read: if isAuth();
+      allow create: if isAuth() && request.auth.uid == userId;
+      allow update: if isOwnerOrAdmin() || (
+        isAuth() && request.auth.uid == userId && request.resource.data.role == resource.data.role
+      );
+      allow delete: if isAdmin();
+    }
+
+    // 3. Parts Inventory
+    match /parts/{partId} {
+      allow read, write: if isAuth();
+      allow delete: if isOwnerOrAdmin();
+    }
+
+    // 4. Stock Movement History
+    match /movements/{movementId} {
+      allow read, write: if isAuth();
+      allow delete: if isOwnerOrAdmin();
+    }
+  }
+}
