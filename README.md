@@ -48,6 +48,10 @@ Operating an automobile spare parts business requires immediate access to thousa
 
 Mary Spares adheres strictly to **Clean Architecture** principles and the modern Android **MVVM (Model-View-ViewModel)** architectural pattern.
 
+<p align="center">
+  <img src="docs/architecture_diagram.jpg" alt="Mary Spares 4-Tier Architecture Diagram" width="100%" />
+</p>
+
 ```mermaid
 graph TD
     subgraph UI_Layer ["UI Layer (Jetpack Compose + Material 3)"]
