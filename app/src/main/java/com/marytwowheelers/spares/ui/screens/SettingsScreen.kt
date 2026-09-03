@@ -1249,7 +1249,7 @@ fun SettingsScreen(
 
                             Button(
                                 onClick = {
-                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/jinsuj/MarySpares"))
+                                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/jinsu-2005/MarySpares-Stock-Manager/releases"))
                                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                                     try {
                                         context.startActivity(intent)

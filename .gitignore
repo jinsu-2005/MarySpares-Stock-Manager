@@ -23,3 +23,7 @@ app/google-services.json
 *.keystore
 *.jks
 *.p12
+
+# Binaries & Distribution (use GitHub Releases)
+apk/
+*.apk
