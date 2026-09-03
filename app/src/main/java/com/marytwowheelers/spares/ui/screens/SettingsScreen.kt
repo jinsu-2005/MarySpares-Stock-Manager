@@ -274,8 +274,8 @@ fun SettingsScreen(
 
                         Surface(
                             shape = RoundedCornerShape(10.dp),
-                            color = if (isDark) Color(0xFF38141B) else Color(0xFFFEF2F2),
-                            border = BorderStroke(1.dp, if (isDark) Color(0xFF5C1D2A) else Color(0xFFFECACA)),
+                            color = if (isDark) Color(0xFF3E1824) else Color(0xFFFEF2F2),
+                            border = BorderStroke(1.dp, if (isDark) Color(0xFF882336) else Color(0xFFFECACA)),
                             modifier = Modifier
                                 .clip(RoundedCornerShape(10.dp))
                                 .clickable { showLogoutDialog = true }
@@ -288,7 +288,7 @@ fun SettingsScreen(
                                 Icon(
                                     imageVector = Icons.AutoMirrored.Filled.ExitToApp,
                                     contentDescription = "Sign Out",
-                                    tint = if (isDark) Color(0xFFFB7185) else Color(0xFFDC2626),
+                                    tint = if (isDark) Color(0xFFFF4D6D) else Color(0xFFDC2626),
                                     modifier = Modifier.size(14.dp)
                                 )
                                 Text(
@@ -296,7 +296,7 @@ fun SettingsScreen(
                                     style = MaterialTheme.typography.labelSmall.copy(
                                         fontSize = 12.sp,
                                         fontWeight = FontWeight.Bold,
-                                        color = if (isDark) Color(0xFFFB7185) else Color(0xFFDC2626)
+                                        color = if (isDark) Color(0xFFFF4D6D) else Color(0xFFDC2626)
                                     )
                                 )
                             }
@@ -1012,8 +1012,8 @@ fun SettingsScreen(
                                     enabled = selectedRetentionPeriod != HistoryRetentionPeriod.NEVER && matchingHistoryCount > 0 && !isClearingHistory,
                                     shape = RoundedCornerShape(12.dp),
                                     colors = ButtonDefaults.buttonColors(
-                                        containerColor = if (isDark) Color(0xFF3B1D25) else Color(0xFFFEE2E2),
-                                        contentColor = if (isDark) Color(0xFFF87171) else Color(0xFFDC2626),
+                                        containerColor = if (isDark) Color(0xFF381520) else Color(0xFFFEE2E2),
+                                        contentColor = if (isDark) Color(0xFFFF4D6D) else Color(0xFFDC2626),
                                         disabledContainerColor = if (isDark) Color(0xFF1E212A) else Color(0xFFF3F4F6),
                                         disabledContentColor = if (isDark) Color(0xFF4B5563) else Color(0xFF9CA3AF)
                                     ),
@@ -1038,7 +1038,7 @@ fun SettingsScreen(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(20.dp),
                         colors = CardDefaults.cardColors(containerColor = cardBg),
-                        border = BorderStroke(1.dp, if (isDark) Color(0xFF5C1D2A) else Color(0xFFFEE2E2)),
+                        border = BorderStroke(1.dp, if (isDark) Color(0xFF882336) else Color(0xFFFEE2E2)),
                         elevation = CardDefaults.cardElevation(0.dp)
                     ) {
                         Column(
@@ -1052,7 +1052,7 @@ fun SettingsScreen(
                                 style = MaterialTheme.typography.titleMedium.copy(
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 16.sp,
-                                    color = if (isDark) Color(0xFFFB7185) else Color(0xFFEF4444)
+                                    color = if (isDark) Color(0xFFFF4D6D) else Color(0xFFEF4444)
                                 )
                             )
 
@@ -1068,12 +1068,12 @@ fun SettingsScreen(
                             OutlinedButton(
                                 onClick = { showResetLocalDbDialog = true },
                                 shape = RoundedCornerShape(10.dp),
-                                border = BorderStroke(1.dp, if (isDark) Color(0xFF5C1D2A) else Color(0xFFEF4444)),
+                                border = BorderStroke(1.dp, if (isDark) Color(0xFF882336) else Color(0xFFEF4444)),
                                 modifier = Modifier.fillMaxWidth()
                             ) {
-                                Icon(Icons.Outlined.DeleteForever, null, tint = if (isDark) Color(0xFFFB7185) else Color(0xFFEF4444), modifier = Modifier.size(18.dp))
+                                Icon(Icons.Outlined.DeleteForever, null, tint = if (isDark) Color(0xFFFF4D6D) else Color(0xFFEF4444), modifier = Modifier.size(18.dp))
                                 Spacer(Modifier.width(8.dp))
-                                Text("Reset Local Database Cache", color = if (isDark) Color(0xFFFB7185) else Color(0xFFEF4444), fontWeight = FontWeight.Bold)
+                                Text("Reset Local Database Cache", color = if (isDark) Color(0xFFFF4D6D) else Color(0xFFEF4444), fontWeight = FontWeight.Bold)
                             }
                         }
                     }
@@ -1089,9 +1089,9 @@ fun SettingsScreen(
                         modifier = Modifier.fillMaxWidth(),
                         shape = RoundedCornerShape(20.dp),
                         colors = CardDefaults.cardColors(
-                            containerColor = if (isDark) Color(0xFF281016) else Color(0xFFFFF1F2)
+                            containerColor = if (isDark) Color(0xFF26151B) else Color(0xFFFFF1F2)
                         ),
-                        border = BorderStroke(1.5.dp, if (isDark) Color(0xFF5C1D2A) else Color(0xFFDC2626)),
+                        border = BorderStroke(1.5.dp, if (isDark) Color(0xFF882336) else Color(0xFFDC2626)),
                         elevation = CardDefaults.cardElevation(2.dp)
                     ) {
                         Column(
@@ -1107,7 +1107,7 @@ fun SettingsScreen(
                                 Icon(
                                     imageVector = Icons.Default.Warning,
                                     contentDescription = null,
-                                    tint = if (isDark) Color(0xFFFB7185) else Color(0xFFDC2626),
+                                    tint = if (isDark) Color(0xFFFF4D6D) else Color(0xFFDC2626),
                                     modifier = Modifier.size(22.dp)
                                 )
                                 Text(
@@ -1115,7 +1115,7 @@ fun SettingsScreen(
                                     style = MaterialTheme.typography.titleMedium.copy(
                                         fontWeight = FontWeight.Black,
                                         fontSize = 16.sp,
-                                        color = if (isDark) Color(0xFFFB7185) else Color(0xFFDC2626)
+                                        color = if (isDark) Color(0xFFFF4D6D) else Color(0xFFDC2626)
                                     )
                                 )
                             }
@@ -2137,7 +2137,7 @@ fun SettingsScreen(
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ExitToApp,
                         contentDescription = null,
-                        tint = if (isDark) Color(0xFFFB7185) else Color(0xFFDC2626)
+                        tint = if (isDark) Color(0xFFFF4D6D) else Color(0xFFDC2626)
                     )
                     Text("Log Out?", fontWeight = FontWeight.Bold)
                 }

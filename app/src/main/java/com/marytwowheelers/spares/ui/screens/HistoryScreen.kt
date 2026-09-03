@@ -254,8 +254,8 @@ fun HistoryMovementCard(
             OperationVisuals("Add Stock", Icons.Outlined.AddCircleOutline, bg, tint, tint, true)
         }
         MovementType.REMOVE -> {
-            val bg = if (isDark) Color(0xFF3B1D25) else Color(0xFFFEE2E2)
-            val tint = if (isDark) Color(0xFFF87171) else Color(0xFFDC2626)
+            val bg = if (isDark) Color(0xFF381520) else Color(0xFFFEE2E2)
+            val tint = if (isDark) Color(0xFFFF4D6D) else Color(0xFFDC2626)
             OperationVisuals("Remove / Sell", Icons.Outlined.RemoveCircleOutline, bg, tint, tint, false)
         }
         MovementType.RETURN -> {
@@ -264,8 +264,8 @@ fun HistoryMovementCard(
             OperationVisuals("Stock Return", Icons.Outlined.RotateLeft, bg, tint, tint, true)
         }
         MovementType.ADJUST -> {
-            val bg = if (isDark) Color(0xFF451A03) else Color(0xFFFEF3C7)
-            val tint = if (isDark) Color(0xFFFBBF24) else Color(0xFFD97706)
+            val bg = if (isDark) Color(0xFF382914) else Color(0xFFFEF3C7)
+            val tint = if (isDark) Color(0xFFFFB726) else Color(0xFFD97706)
             val isPos = record.delta >= 0
             OperationVisuals("Stock Adjustment", Icons.Outlined.Tune, bg, tint, tint, isPos)
         }
@@ -333,7 +333,7 @@ fun HistoryMovementCard(
                                 style = MaterialTheme.typography.labelSmall.copy(
                                     fontSize = 10.5.sp,
                                     fontWeight = FontWeight.Medium,
-                                    color = if (isDark) Color(0xFFFBBF24) else Color(0xFFD97706)
+                                    color = if (isDark) Color(0xFFFFB726) else Color(0xFFD97706)
                                 )
                             )
                         }
@@ -475,7 +475,7 @@ fun HistoryMovementCard(
                             fontSize = 11.sp,
                             fontWeight = FontWeight.Medium,
                             color = if (record.type == MovementType.ADJUST) {
-                                if (isDark) Color(0xFFFBBF24) else Color(0xFFB45309)
+                                if (isDark) Color(0xFFFFB726) else Color(0xFFB45309)
                             } else {
                                 secondaryText
                             }

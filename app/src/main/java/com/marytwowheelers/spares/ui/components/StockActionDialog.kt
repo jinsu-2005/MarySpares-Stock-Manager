@@ -68,8 +68,8 @@ fun StockActionDialog(
         MovementType.REMOVE -> Quadruple(
             "Remove Stock",
             Icons.Outlined.RemoveCircleOutline,
-            if (isDark) Color(0xFFFB7185) else Color(0xFFF43F5E),
-            if (isDark) Color(0xFF38141B) else Color(0xFFFFEEF0)
+            if (isDark) Color(0xFFFF4D6D) else Color(0xFFF43F5E),
+            if (isDark) Color(0xFF381520) else Color(0xFFFFEEF0)
         )
         MovementType.RETURN -> Quadruple(
             "Record Customer Return",
@@ -80,8 +80,8 @@ fun StockActionDialog(
         MovementType.ADJUST -> Quadruple(
             "Adjust Count",
             Icons.Outlined.Tune,
-            if (isDark) Color(0xFFFBBF24) else Color(0xFFD97706),
-            if (isDark) Color(0xFF451A03) else Color(0xFFFEF3C7)
+            if (isDark) Color(0xFFFFB726) else Color(0xFFD97706),
+            if (isDark) Color(0xFF382914) else Color(0xFFFEF3C7)
         )
     }
 
@@ -255,7 +255,7 @@ fun StockActionDialog(
                 shape = RoundedCornerShape(10.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = when {
-                        actionType == MovementType.REMOVE && isDark -> Color(0xFFE11D48)
+                        actionType == MovementType.REMOVE && isDark -> Color(0xFFF43F5E)
                         actionType == MovementType.ADD && isDark -> Color(0xFF059669)
                         actionType == MovementType.RETURN && isDark -> Color(0xFF6366F1)
                         actionType == MovementType.ADJUST && isDark -> Color(0xFFD97706)

@@ -92,9 +92,9 @@ fun StockAlertDialog(
                                 .size(36.dp)
                                 .background(
                                     color = if (allAlerts.isNotEmpty()) {
-                                        if (isDark) Color(0xFF451A03) else Color(0xFFFEF3C7)
+                                        if (isDark) Color(0xFF382914) else Color(0xFFFEF3C7)
                                     } else {
-                                        if (isDark) Color(0xFF064E3B) else Color(0xFFDCFCE7)
+                                        if (isDark) Color(0xFF0D382B) else Color(0xFFDCFCE7)
                                     },
                                     shape = CircleShape
                                 ),
@@ -104,7 +104,7 @@ fun StockAlertDialog(
                                 imageVector = if (allAlerts.isNotEmpty()) Icons.Outlined.NotificationsActive else Icons.Outlined.CheckCircle,
                                 contentDescription = null,
                                 tint = if (allAlerts.isNotEmpty()) {
-                                    if (isDark) Color(0xFFFBBF24) else Color(0xFFD97706)
+                                    if (isDark) Color(0xFFFFB726) else Color(0xFFD97706)
                                 } else {
                                     if (isDark) Color(0xFF34D399) else Color(0xFF059669)
                                 },
@@ -258,8 +258,8 @@ fun StockAlertDialog(
                         val isOutSelected = selectedTab == StockAlertTab.OUT
                         Surface(
                             shape = RoundedCornerShape(8.dp),
-                            color = if (isOutSelected) (if (isDark) Color(0xFF38141B) else Color(0xFFFEE2E2)) else pillBg,
-                            border = BorderStroke(1.dp, if (isOutSelected) (if (isDark) Color(0xFF5C1D2A) else Color(0xFFFECDD3)) else Color.Transparent),
+                            color = if (isOutSelected) (if (isDark) Color(0xFF3E1824) else Color(0xFFFEE2E2)) else pillBg,
+                            border = BorderStroke(1.dp, if (isOutSelected) (if (isDark) Color(0xFF882336) else Color(0xFFFECDD3)) else Color.Transparent),
                             modifier = Modifier
                                 .weight(1f)
                                 .clip(RoundedCornerShape(8.dp))
@@ -270,7 +270,7 @@ fun StockAlertDialog(
                                 style = MaterialTheme.typography.labelSmall.copy(
                                     fontSize = 11.sp,
                                     fontWeight = if (isOutSelected) FontWeight.Bold else FontWeight.Medium,
-                                    color = if (isOutSelected) (if (isDark) Color(0xFFFB7185) else Color(0xFFDC2626)) else secondaryText
+                                    color = if (isOutSelected) (if (isDark) Color(0xFFFF4D6D) else Color(0xFFDC2626)) else secondaryText
                                 ),
                                 modifier = Modifier.padding(vertical = 6.dp),
                                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
@@ -281,8 +281,8 @@ fun StockAlertDialog(
                         val isLowSelected = selectedTab == StockAlertTab.LOW
                         Surface(
                             shape = RoundedCornerShape(8.dp),
-                            color = if (isLowSelected) (if (isDark) Color(0xFF382A11) else Color(0xFFFEF3C7)) else pillBg,
-                            border = BorderStroke(1.dp, if (isLowSelected) (if (isDark) Color(0xFF5C4419) else Color(0xFFFDE68A)) else Color.Transparent),
+                            color = if (isLowSelected) (if (isDark) Color(0xFF382914) else Color(0xFFFEF3C7)) else pillBg,
+                            border = BorderStroke(1.dp, if (isLowSelected) (if (isDark) Color(0xFF8F6314) else Color(0xFFFDE68A)) else Color.Transparent),
                             modifier = Modifier
                                 .weight(1f)
                                 .clip(RoundedCornerShape(8.dp))
@@ -293,7 +293,7 @@ fun StockAlertDialog(
                                 style = MaterialTheme.typography.labelSmall.copy(
                                     fontSize = 11.sp,
                                     fontWeight = if (isLowSelected) FontWeight.Bold else FontWeight.Medium,
-                                    color = if (isLowSelected) (if (isDark) Color(0xFFFBBF24) else Color(0xFFB45309)) else secondaryText
+                                    color = if (isLowSelected) (if (isDark) Color(0xFFFFB726) else Color(0xFFB45309)) else secondaryText
                                 ),
                                 modifier = Modifier.padding(vertical = 6.dp),
                                 textAlign = androidx.compose.ui.text.style.TextAlign.Center
@@ -319,9 +319,9 @@ fun StockAlertDialog(
                                 border = BorderStroke(
                                     1.dp,
                                     if (isOut) {
-                                        if (isDark) Color(0xFF5C1D2A) else Color(0xFFFECDD3)
+                                        if (isDark) Color(0xFF882336) else Color(0xFFFECDD3)
                                     } else {
-                                        if (isDark) Color(0xFF5C4419) else Color(0xFFFDE68A)
+                                        if (isDark) Color(0xFF8F6314) else Color(0xFFFDE68A)
                                     }
                                 ),
                                 modifier = Modifier
@@ -358,7 +358,7 @@ fun StockAlertDialog(
                                                 Box(
                                                     modifier = Modifier
                                                         .size(6.dp)
-                                                        .background(if (isDark) Color(0xFFFB7185) else Color(0xFFEF4444), CircleShape)
+                                                        .background(if (isDark) Color(0xFFFF4D6D) else Color(0xFFEF4444), CircleShape)
                                                 )
                                             }
                                         }
@@ -391,9 +391,9 @@ fun StockAlertDialog(
                                         Surface(
                                             shape = RoundedCornerShape(6.dp),
                                             color = if (isOut) {
-                                                if (isDark) Color(0xFF38141B) else Color(0xFFFEE2E2)
+                                                if (isDark) Color(0xFF3E1824) else Color(0xFFFEE2E2)
                                             } else {
-                                                if (isDark) Color(0xFF451A03) else Color(0xFFFEF3C7)
+                                                if (isDark) Color(0xFF382914) else Color(0xFFFEF3C7)
                                             }
                                         ) {
                                             Text(
@@ -402,9 +402,9 @@ fun StockAlertDialog(
                                                     fontSize = 11.sp,
                                                     fontWeight = FontWeight.Bold,
                                                     color = if (isOut) {
-                                                        if (isDark) Color(0xFFFB7185) else Color(0xFFDC2626)
+                                                        if (isDark) Color(0xFFFF4D6D) else Color(0xFFDC2626)
                                                     } else {
-                                                        if (isDark) Color(0xFFFDE047) else Color(0xFFD97706)
+                                                        if (isDark) Color(0xFFFFB726) else Color(0xFFD97706)
                                                     }
                                                 ),
                                                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 3.dp)

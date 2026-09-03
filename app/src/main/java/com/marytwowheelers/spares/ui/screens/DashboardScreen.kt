@@ -404,7 +404,7 @@ fun DashboardScreen(
                     // Low Stock
                     TopMetricCard(
                         icon = Icons.Outlined.WarningAmber,
-                        iconTint = if (isDark) Color(0xFFF59E0B) else Color(0xFFD97706),
+                        iconTint = if (isDark) Color(0xFFFFB726) else Color(0xFFD97706),
                         value = "$lowStockCount",
                         label = "Low Stock",
                         cardBg = cardBg,
@@ -418,7 +418,7 @@ fun DashboardScreen(
                     // Out of Stock
                     TopMetricCard(
                         icon = Icons.Outlined.Archive,
-                        iconTint = if (isDark) Color(0xFFFB7185) else Color(0xFFDC2626),
+                        iconTint = if (isDark) Color(0xFFFF4D6D) else Color(0xFFDC2626),
                         value = "$outOfStockCount",
                         label = "Out of Stock",
                         cardBg = cardBg,
@@ -538,8 +538,8 @@ fun DashboardScreen(
                         // REMOVE STOCK
                         ActionCard(
                             icon = if (currentUserRole.isReadOnly) Icons.Outlined.Lock else Icons.Default.Remove,
-                            iconBg = if (isDark) Color(0xFF38141B) else Color(0xFFFFEEF0),
-                            iconTint = if (isDark) Color(0xFFFB7185) else Color(0xFFF43F5E),
+                            iconBg = if (isDark) Color(0xFF381520) else Color(0xFFFFEEF0),
+                            iconTint = if (isDark) Color(0xFFFF4D6D) else Color(0xFFF43F5E),
                             title = "Remove Stock",
                             subtitle = if (currentUserRole.isReadOnly) "Locked" else "",
                             cardBg = cardBg,
@@ -570,19 +570,19 @@ fun DashboardScreen(
                     val isCritical = outOfStockCount > 0
 
                     val alertCardBg = if (isCritical) {
-                        if (isDark) Color(0xFF281016) else Color(0xFFFFF1F2)
+                        if (isDark) Color(0xFF26151B) else Color(0xFFFFF1F2)
                     } else {
-                        if (isDark) Color(0xFF2B1F11) else Color(0xFFFFFBEB)
+                        if (isDark) Color(0xFF261F14) else Color(0xFFFFFBEB)
                     }
                     val alertCardBorder = if (isCritical) {
-                        if (isDark) Color(0xFF5C1D2A) else Color(0xFFFECDD3)
+                        if (isDark) Color(0xFF882336) else Color(0xFFFECDD3)
                     } else {
-                        if (isDark) Color(0xFF5C4116) else Color(0xFFFDE68A)
+                        if (isDark) Color(0xFF8F6314) else Color(0xFFFDE68A)
                     }
                     val alertAccent = if (isCritical) {
-                        if (isDark) Color(0xFFFB7185) else Color(0xFFDC2626)
+                        if (isDark) Color(0xFFFF4D6D) else Color(0xFFDC2626)
                     } else {
-                        if (isDark) Color(0xFFFBBF24) else Color(0xFFD97706)
+                        if (isDark) Color(0xFFFFB726) else Color(0xFFD97706)
                     }
 
                     Card(
@@ -605,8 +605,8 @@ fun DashboardScreen(
                                 modifier = Modifier
                                     .size(38.dp)
                                     .background(
-                                        color = if (isCritical) (if (isDark) Color(0xFF451922) else Color(0xFFFFE4E6))
-                                                else (if (isDark) Color(0xFF42280E) else Color(0xFFFEF3C7)),
+                                        color = if (isCritical) (if (isDark) Color(0xFF3E1824) else Color(0xFFFFE4E6))
+                                                else (if (isDark) Color(0xFF382914) else Color(0xFFFEF3C7)),
                                         shape = CircleShape
                                     ),
                                 contentAlignment = Alignment.Center
@@ -637,8 +637,8 @@ fun DashboardScreen(
 
                                     Surface(
                                         shape = RoundedCornerShape(6.dp),
-                                        color = if (isCritical) (if (isDark) Color(0xFF4C1D26) else Color(0xFFFEE2E2))
-                                                else (if (isDark) Color(0xFF42280E) else Color(0xFFFEF3C7))
+                                        color = if (isCritical) (if (isDark) Color(0xFF3E1824) else Color(0xFFFEE2E2))
+                                                else (if (isDark) Color(0xFF382914) else Color(0xFFFEF3C7))
                                     ) {
                                         Text(
                                             text = if (isCritical) "$outOfStockCount Empty" else "$unreviewedAlertCount New",
@@ -673,8 +673,8 @@ fun DashboardScreen(
 
                             Surface(
                                 shape = RoundedCornerShape(8.dp),
-                                color = if (isCritical) (if (isDark) Color(0xFF451922) else Color(0xFFFFE4E6))
-                                        else (if (isDark) Color(0xFF42280E) else Color(0xFFFEF3C7))
+                                color = if (isCritical) (if (isDark) Color(0xFF3E1824) else Color(0xFFFFE4E6))
+                                        else (if (isDark) Color(0xFF382914) else Color(0xFFFEF3C7))
                             ) {
                                 Row(
                                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
@@ -982,9 +982,9 @@ private fun SelectPartDialog(
                         .size(36.dp)
                         .background(
                             color = if (actionType == MovementType.ADD) {
-                                if (isDark) Color(0xFF064E3B) else Color(0xFFDCFCE7)
+                                if (isDark) Color(0xFF0D382B) else Color(0xFFDCFCE7)
                             } else {
-                                if (isDark) Color(0xFF3B1D25) else Color(0xFFFEE2E2)
+                                if (isDark) Color(0xFF381520) else Color(0xFFFEE2E2)
                             },
                             shape = CircleShape
                         ),
@@ -996,7 +996,7 @@ private fun SelectPartDialog(
                         tint = if (actionType == MovementType.ADD) {
                             if (isDark) Color(0xFF34D399) else Color(0xFF059669)
                         } else {
-                            if (isDark) Color(0xFFF87171) else Color(0xFFDC2626)
+                            if (isDark) Color(0xFFFF4D6D) else Color(0xFFDC2626)
                         },
                         modifier = Modifier.size(20.dp)
                     )
@@ -1135,9 +1135,9 @@ private fun SelectPartDialog(
                                     Surface(
                                         shape = RoundedCornerShape(8.dp),
                                         color = when {
-                                            isOut -> if (isDark) Color(0xFF3B1D25) else Color(0xFFFEE2E2)
-                                            isLow -> if (isDark) Color(0xFF451A03) else Color(0xFFFEF3C7)
-                                            else  -> if (isDark) Color(0xFF064E3B) else Color(0xFFDCFCE7)
+                                            isOut -> if (isDark) Color(0xFF3E1824) else Color(0xFFFEE2E2)
+                                            isLow -> if (isDark) Color(0xFF382914) else Color(0xFFFEF3C7)
+                                            else  -> if (isDark) Color(0xFF0D382B) else Color(0xFFDCFCE7)
                                         }
                                     ) {
                                         Text(
@@ -1146,8 +1146,8 @@ private fun SelectPartDialog(
                                                 fontSize = 11.5.sp,
                                                 fontWeight = FontWeight.Bold,
                                                 color = when {
-                                                    isOut -> if (isDark) Color(0xFFF87171) else Color(0xFFDC2626)
-                                                    isLow -> if (isDark) Color(0xFFFBBF24) else Color(0xFFD97706)
+                                                    isOut -> if (isDark) Color(0xFFFF4D6D) else Color(0xFFDC2626)
+                                                    isLow -> if (isDark) Color(0xFFFFB726) else Color(0xFFD97706)
                                                     else  -> if (isDark) Color(0xFF34D399) else Color(0xFF059669)
                                                 }
                                             ),

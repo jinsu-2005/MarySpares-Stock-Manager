@@ -171,19 +171,19 @@ fun PartDetailsScreen(
             val (statusText, statusBadgeBg, statusBadgeTint, statusIcon) = when {
                 isOut -> Quadruple(
                     "OUT OF STOCK",
-                    if (isDark) Color(0xFF3B1D25) else Color(0xFFFEE2E2),
-                    if (isDark) Color(0xFFF87171) else Color(0xFFDC2626),
+                    if (isDark) Color(0xFF3E1824) else Color(0xFFFEE2E2),
+                    if (isDark) Color(0xFFFF4D6D) else Color(0xFFDC2626),
                     Icons.Default.ErrorOutline
                 )
                 isLow -> Quadruple(
                     "LOW STOCK",
-                    if (isDark) Color(0xFF451A03) else Color(0xFFFEF3C7),
-                    if (isDark) Color(0xFFFBBF24) else Color(0xFFD97706),
+                    if (isDark) Color(0xFF382914) else Color(0xFFFEF3C7),
+                    if (isDark) Color(0xFFFFB726) else Color(0xFFD97706),
                     Icons.Outlined.WarningAmber
                 )
                 else -> Quadruple(
                     "IN STOCK",
-                    if (isDark) Color(0xFF064E3B) else Color(0xFFDCFCE7),
+                    if (isDark) Color(0xFF0D382B) else Color(0xFFDCFCE7),
                     if (isDark) Color(0xFF34D399) else Color(0xFF059669),
                     Icons.Outlined.CheckCircle
                 )
@@ -266,9 +266,9 @@ fun PartDetailsScreen(
                                             Surface(
                                                 shape = RoundedCornerShape(6.dp),
                                                 color = when {
-                                                    isPendingOffline -> if (isDark) Color(0xFF3B1D25) else Color(0xFFFEE2E2)
+                                                    isPendingOffline -> if (isDark) Color(0xFF381520) else Color(0xFFFEE2E2)
                                                     isActivelySyncing -> if (isDark) Color(0xFF1E293B) else Color(0xFFDBEAFE)
-                                                    else -> if (isDark) Color(0xFF451A03) else Color(0xFFFEF3C7)
+                                                    else -> if (isDark) Color(0xFF382914) else Color(0xFFFEF3C7)
                                                 }
                                             ) {
                                                 Text(
@@ -281,9 +281,9 @@ fun PartDetailsScreen(
                                                         fontSize = 10.5.sp,
                                                         fontWeight = FontWeight.Medium,
                                                         color = when {
-                                                            isPendingOffline -> if (isDark) Color(0xFFFCA5A5) else Color(0xFFDC2626)
+                                                            isPendingOffline -> if (isDark) Color(0xFFFF4D6D) else Color(0xFFDC2626)
                                                             isActivelySyncing -> if (isDark) Color(0xFF93C5FD) else Color(0xFF2563EB)
-                                                            else -> if (isDark) Color(0xFFFBBF24) else Color(0xFFB45309)
+                                                            else -> if (isDark) Color(0xFFFFB726) else Color(0xFFB45309)
                                                         }
                                                     ),
                                                     modifier = Modifier.padding(horizontal = 6.dp, vertical = 3.dp)
@@ -560,8 +560,8 @@ fun PartDetailsScreen(
                                     title = "Remove Stock",
                                     subtitle = "",
                                     icon = Icons.Outlined.RemoveCircleOutline,
-                                    iconBg = if (isDark) Color(0xFF38141B) else Color(0xFFFEE2E2),
-                                    iconTint = if (isDark) Color(0xFFFB7185) else Color(0xFFDC2626),
+                                    iconBg = if (isDark) Color(0xFF381520) else Color(0xFFFEE2E2),
+                                    iconTint = if (isDark) Color(0xFFFF4D6D) else Color(0xFFDC2626),
                                     cardBg = cardBg,
                                     cardBorder = cardBorder,
                                     primaryText = primaryText,
@@ -597,8 +597,8 @@ fun PartDetailsScreen(
                                         title = "Adjust Count",
                                         subtitle = "",
                                         icon = Icons.Outlined.Tune,
-                                        iconBg = if (isDark) Color(0xFF451A03) else Color(0xFFFEF3C7),
-                                        iconTint = if (isDark) Color(0xFFFBBF24) else Color(0xFFD97706),
+                                        iconBg = if (isDark) Color(0xFF382914) else Color(0xFFFEF3C7),
+                                        iconTint = if (isDark) Color(0xFFFFB726) else Color(0xFFD97706),
                                         cardBg = cardBg,
                                         cardBorder = cardBorder,
                                         primaryText = primaryText,
@@ -744,7 +744,7 @@ fun PartDetailsScreen(
                     Icon(
                         imageVector = Icons.Outlined.DeleteOutline,
                         contentDescription = null,
-                        tint = if (isDark) Color(0xFFFB7185) else Color(0xFFEF4444)
+                        tint = if (isDark) Color(0xFFFF4D6D) else Color(0xFFEF4444)
                     )
                     Text("Delete Part?", fontWeight = FontWeight.Bold)
                 }
@@ -880,8 +880,8 @@ private fun PartMovementHistoryCard(
             Quadruple5("Add Stock", Icons.Outlined.AddCircleOutline, bg, tint, tint)
         }
         MovementType.REMOVE -> {
-            val bg = if (isDark) Color(0xFF38141B) else Color(0xFFFEE2E2)
-            val tint = if (isDark) Color(0xFFFB7185) else Color(0xFFDC2626)
+            val bg = if (isDark) Color(0xFF381520) else Color(0xFFFEE2E2)
+            val tint = if (isDark) Color(0xFFFF4D6D) else Color(0xFFDC2626)
             Quadruple5("Remove / Sell", Icons.Outlined.RemoveCircleOutline, bg, tint, tint)
         }
         MovementType.RETURN -> {
@@ -890,8 +890,8 @@ private fun PartMovementHistoryCard(
             Quadruple5("Stock Return", Icons.Outlined.RotateLeft, bg, tint, tint)
         }
         MovementType.ADJUST -> {
-            val bg = if (isDark) Color(0xFF451A03) else Color(0xFFFEF3C7)
-            val tint = if (isDark) Color(0xFFFBBF24) else Color(0xFFD97706)
+            val bg = if (isDark) Color(0xFF382914) else Color(0xFFFEF3C7)
+            val tint = if (isDark) Color(0xFFFFB726) else Color(0xFFD97706)
             Quadruple5("Stock Adjustment", Icons.Outlined.Tune, bg, tint, tint)
         }
     }

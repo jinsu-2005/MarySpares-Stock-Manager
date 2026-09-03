@@ -52,12 +52,12 @@ val StockOut           = Color(0xFFEF4444)
 val StockOutBg         = Color(0xFFFEE2E2)
 
 val StockHealthyDark   = Color(0xFF34D399)
-val StockHealthyBgDark = Color(0xFF064E3B)
-val StockLowDark       = Color(0xFFFBBF24)
-val StockLowBgDark     = Color(0xFF292110)
-val StockOutDark       = Color(0xFFFB7185) // Vibrant coral rose for dark surfaces
-val StockOutBgDark     = Color(0xFF38141B) // Deep wine crimson container
-val RedActionDark      = Color(0xFFE11D48) // Bold high-contrast red for buttons in dark mode
+val StockHealthyBgDark = Color(0xFF0D382B)
+val StockLowDark       = Color(0xFFFFB726) // Radiant golden amber (crisp, warm, high-contrast)
+val StockLowBgDark     = Color(0xFF382914) // Rich dark warm amber surface (no mud)
+val StockOutDark       = Color(0xFFFF4D6D) // Vibrant neon crimson-red (no washed out pink)
+val StockOutBgDark     = Color(0xFF3E1824) // Deep refined ruby-charcoal surface
+val RedActionDark      = Color(0xFFF43F5E) // High-contrast punchy red for action buttons
 
 // =============================================
 // LEGACY ALIASES (for AuthScreen compat)

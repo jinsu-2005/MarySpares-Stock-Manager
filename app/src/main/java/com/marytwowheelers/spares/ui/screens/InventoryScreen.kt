@@ -477,9 +477,9 @@ fun InventoryScreen(
                 InventorySegmentFilterChip(
                     label = "Low ($lowStockCount)",
                     isSelected = selectedFilter == InventoryFilter.LOW_STOCK,
-                    activeBg = if (isDark) Color(0xFF382A11) else Color(0xFFFEF3C7),
-                    activeTextColor = if (isDark) Color(0xFFFBBF24) else Color(0xFFB45309),
-                    activeBorderColor = if (isDark) Color(0xFF6B4D16) else Color(0xFFFDE68A),
+                    activeBg = if (isDark) Color(0xFF382914) else Color(0xFFFEF3C7),
+                    activeTextColor = if (isDark) Color(0xFFFFB726) else Color(0xFFB45309),
+                    activeBorderColor = if (isDark) Color(0xFF8F6314) else Color(0xFFFDE68A),
                     cardBg = cardBg,
                     cardBorder = cardBorder,
                     secondaryText = secondaryText,
@@ -491,9 +491,9 @@ fun InventoryScreen(
                 InventorySegmentFilterChip(
                     label = "Empty ($outOfStockCount)",
                     isSelected = selectedFilter == InventoryFilter.OUT_OF_STOCK,
-                    activeBg = if (isDark) Color(0xFF38141B) else Color(0xFFFEE2E2),
-                    activeTextColor = if (isDark) Color(0xFFFB7185) else Color(0xFFDC2626),
-                    activeBorderColor = if (isDark) Color(0xFF6B2130) else Color(0xFFFECACA),
+                    activeBg = if (isDark) Color(0xFF3E1824) else Color(0xFFFEE2E2),
+                    activeTextColor = if (isDark) Color(0xFFFF4D6D) else Color(0xFFDC2626),
+                    activeBorderColor = if (isDark) Color(0xFF882336) else Color(0xFFFECACA),
                     cardBg = cardBg,
                     cardBorder = cardBorder,
                     secondaryText = secondaryText,
@@ -870,20 +870,20 @@ fun InventoryPartCard(
     )
 
     val statusBadgeBg = when {
-        isOut -> if (isDark) Color(0xFF38141B) else Color(0xFFFEE2E2)
-        isLow -> if (isDark) Color(0xFF451A03) else Color(0xFFFEF3C7)
-        else  -> if (isDark) Color(0xFF064E3B) else Color(0xFFDCFCE7)
+        isOut -> if (isDark) Color(0xFF3E1824) else Color(0xFFFEE2E2)
+        isLow -> if (isDark) Color(0xFF382914) else Color(0xFFFEF3C7)
+        else  -> if (isDark) Color(0xFF0D382B) else Color(0xFFDCFCE7)
     }
 
     val statusBadgeTint = when {
-        isOut -> if (isDark) Color(0xFFFB7185) else Color(0xFFEF4444)
-        isLow -> if (isDark) Color(0xFFFBBF24) else Color(0xFFD97706)
+        isOut -> if (isDark) Color(0xFFFF4D6D) else Color(0xFFEF4444)
+        isLow -> if (isDark) Color(0xFFFFB726) else Color(0xFFD97706)
         else  -> if (isDark) Color(0xFF34D399) else Color(0xFF10B981)
     }
 
     val stockNumberColor = when {
-        isOut -> if (isDark) Color(0xFFFB7185) else Color(0xFFEF4444)
-        isLow -> if (isDark) Color(0xFFFBBF24) else Color(0xFFD97706)
+        isOut -> if (isDark) Color(0xFFFF4D6D) else Color(0xFFEF4444)
+        isLow -> if (isDark) Color(0xFFFFB726) else Color(0xFFD97706)
         else  -> primaryText
     }
 
@@ -894,8 +894,8 @@ fun InventoryPartCard(
     }
 
     val stockLabelColor = when {
-        isOut -> if (isDark) Color(0xFFFB7185) else Color(0xFFEF4444)
-        isLow -> if (isDark) Color(0xFFFBBF24) else Color(0xFFD97706)
+        isOut -> if (isDark) Color(0xFFFF4D6D) else Color(0xFFEF4444)
+        isLow -> if (isDark) Color(0xFFFFB726) else Color(0xFFD97706)
         else  -> secondaryText
     }
 
