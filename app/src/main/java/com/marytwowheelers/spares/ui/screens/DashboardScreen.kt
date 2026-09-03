@@ -396,6 +396,7 @@ fun DashboardScreen(
                         cardBorder = cardBorder,
                         primaryText = primaryText,
                         secondaryText = secondaryText,
+                        onClick = onNavigateToInventory,
                         modifier = Modifier.weight(1f)
                     )
 
@@ -409,6 +410,7 @@ fun DashboardScreen(
                         cardBorder = cardBorder,
                         primaryText = primaryText,
                         secondaryText = secondaryText,
+                        onClick = { showStockAlertDialog = true },
                         modifier = Modifier.weight(1f)
                     )
 
@@ -422,6 +424,7 @@ fun DashboardScreen(
                         cardBorder = cardBorder,
                         primaryText = primaryText,
                         secondaryText = secondaryText,
+                        onClick = { showStockAlertDialog = true },
                         modifier = Modifier.weight(1f)
                     )
 
@@ -435,6 +438,7 @@ fun DashboardScreen(
                         cardBorder = cardBorder,
                         primaryText = primaryText,
                         secondaryText = secondaryText,
+                        onClick = { viewModel.triggerSync() },
                         modifier = Modifier.weight(1f)
                     )
                 }
@@ -473,8 +477,8 @@ fun DashboardScreen(
                         // ADD PART BUTTON
                         ActionCard(
                             icon = Icons.Default.Add,
-                            iconBg = if (isDark) Color(0xFF14382B) else Color(0xFFDCFCE7),
-                            iconTint = if (isDark) Color(0xFF34D399) else Color(0xFF10B981),
+                            iconBg = if (isDark) Color(0xFF0F3B2E) else Color(0xFFE6F9F0),
+                            iconTint = if (isDark) Color(0xFF34D399) else Color(0xFF059669),
                             title = "Add Part",
                             subtitle = "",
                             cardBg = cardBg,
@@ -494,8 +498,8 @@ fun DashboardScreen(
                         // ADD STOCK
                         ActionCard(
                             icon = Icons.Default.Add,
-                            iconBg = if (isDark) Color(0xFF232C4A) else Color(0xFFF3E8FF),
-                            iconTint = if (isDark) Color(0xFF60A5FA) else Color(0xFF8B5CF6),
+                            iconBg = if (isDark) Color(0xFF1E284A) else Color(0xFFEFF4FF),
+                            iconTint = if (isDark) Color(0xFF60A5FA) else Color(0xFF2563EB),
                             title = "Add Stock",
                             subtitle = "",
                             cardBg = cardBg,
@@ -525,36 +529,35 @@ fun DashboardScreen(
             }
 
             // ─────────────────────────────────────────────
-            // 5. STOCK ALERT PANEL (Primary Actionable Notification Area)
+            // 5. STOCK ALERT BANNER (Only shown when action is needed)
             // ─────────────────────────────────────────────
-            val totalAlerts = allAlerts.size
-            if (totalAlerts > 0) {
+            val hasActiveAlerts = unreviewedAlertCount > 0 || outOfStockCount > 0
+            if (hasActiveAlerts) {
                 item {
-                    val hasUnreviewed = unreviewedAlertCount > 0
-                    val isCritical = outOfStockCount > 0 && hasUnreviewed
+                    val isCritical = outOfStockCount > 0
 
-                    val alertCardBg = when {
-                        !hasUnreviewed -> if (isDark) Color(0xFF1B1E26) else Color(0xFFF1F3F9)
-                        isCritical -> if (isDark) Color(0xFF281016) else Color(0xFFFFF1F2)
-                        else -> if (isDark) Color(0xFF2B1F11) else Color(0xFFFFFBEB)
+                    val alertCardBg = if (isCritical) {
+                        if (isDark) Color(0xFF281016) else Color(0xFFFFF1F2)
+                    } else {
+                        if (isDark) Color(0xFF2B1F11) else Color(0xFFFFFBEB)
                     }
-                    val alertCardBorder = when {
-                        !hasUnreviewed -> if (isDark) Color(0xFF2A2E3D) else Color(0xFFE2E8F0)
-                        isCritical -> if (isDark) Color(0xFF5C1D2A) else Color(0xFFFECDD3)
-                        else -> if (isDark) Color(0xFF5C4116) else Color(0xFFFDE68A)
+                    val alertCardBorder = if (isCritical) {
+                        if (isDark) Color(0xFF5C1D2A) else Color(0xFFFECDD3)
+                    } else {
+                        if (isDark) Color(0xFF5C4116) else Color(0xFFFDE68A)
                     }
-                    val alertAccent = when {
-                        !hasUnreviewed -> if (isDark) Color(0xFF34D399) else Color(0xFF059669)
-                        isCritical -> if (isDark) Color(0xFFFB7185) else Color(0xFFDC2626)
-                        else -> if (isDark) Color(0xFFFBBF24) else Color(0xFFD97706)
+                    val alertAccent = if (isCritical) {
+                        if (isDark) Color(0xFFFB7185) else Color(0xFFDC2626)
+                    } else {
+                        if (isDark) Color(0xFFFBBF24) else Color(0xFFD97706)
                     }
 
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clip(RoundedCornerShape(20.dp))
+                            .clip(RoundedCornerShape(16.dp))
                             .clickable { showStockAlertDialog = true },
-                        shape = RoundedCornerShape(20.dp),
+                        shape = RoundedCornerShape(16.dp),
                         colors = CardDefaults.cardColors(containerColor = alertCardBg),
                         border = BorderStroke(1.2.dp, alertCardBorder),
                         elevation = CardDefaults.cardElevation(0.dp)
@@ -562,31 +565,24 @@ fun DashboardScreen(
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 14.dp),
+                                .padding(horizontal = 14.dp, vertical = 12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Box(
                                 modifier = Modifier
-                                    .size(42.dp)
+                                    .size(38.dp)
                                     .background(
-                                        color = when {
-                                            !hasUnreviewed -> if (isDark) Color(0xFF064E3B) else Color(0xFFDCFCE7)
-                                            isCritical -> if (isDark) Color(0xFF451922) else Color(0xFFFFE4E6)
-                                            else -> if (isDark) Color(0xFF42280E) else Color(0xFFFEF3C7)
-                                        },
+                                        color = if (isCritical) (if (isDark) Color(0xFF451922) else Color(0xFFFFE4E6))
+                                                else (if (isDark) Color(0xFF42280E) else Color(0xFFFEF3C7)),
                                         shape = CircleShape
                                     ),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
-                                    imageVector = when {
-                                        !hasUnreviewed -> Icons.Outlined.CheckCircle
-                                        isCritical -> Icons.Outlined.ErrorOutline
-                                        else -> Icons.Outlined.WarningAmber
-                                    },
+                                    imageVector = if (isCritical) Icons.Outlined.ErrorOutline else Icons.Outlined.WarningAmber,
                                     contentDescription = null,
                                     tint = alertAccent,
-                                    modifier = Modifier.size(22.dp)
+                                    modifier = Modifier.size(20.dp)
                                 )
                             }
 
@@ -595,31 +591,24 @@ fun DashboardScreen(
                             Column(modifier = Modifier.weight(1f)) {
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                                 ) {
                                     Text(
-                                        text = when {
-                                            !hasUnreviewed -> "Low Stock Monitored"
-                                            isCritical -> "Restock Required"
-                                            else -> "Low Stock Alert"
-                                        },
+                                        text = if (isCritical) "Out of Stock Alert" else "Low Stock Alert",
                                         style = MaterialTheme.typography.titleMedium.copy(
                                             fontWeight = FontWeight.Bold,
-                                            fontSize = 15.sp,
+                                            fontSize = 14.5.sp,
                                             color = primaryText
                                         )
                                     )
 
                                     Surface(
                                         shape = RoundedCornerShape(6.dp),
-                                        color = when {
-                                            !hasUnreviewed -> if (isDark) Color(0xFF064E3B) else Color(0xFFDCFCE7)
-                                            isCritical -> if (isDark) Color(0xFF4C1D26) else Color(0xFFFEE2E2)
-                                            else -> if (isDark) Color(0xFF42280E) else Color(0xFFFEF3C7)
-                                        }
+                                        color = if (isCritical) (if (isDark) Color(0xFF4C1D26) else Color(0xFFFEE2E2))
+                                                else (if (isDark) Color(0xFF42280E) else Color(0xFFFEF3C7))
                                     ) {
                                         Text(
-                                            text = if (!hasUnreviewed) "$totalAlerts Monitored (≤5)" else "$unreviewedAlertCount New",
+                                            text = if (isCritical) "$outOfStockCount Empty" else "$unreviewedAlertCount New",
                                             style = MaterialTheme.typography.labelSmall.copy(
                                                 fontSize = 10.5.sp,
                                                 fontWeight = FontWeight.Bold,
@@ -630,63 +619,39 @@ fun DashboardScreen(
                                     }
                                 }
 
-                                Spacer(Modifier.height(4.dp))
+                                Spacer(Modifier.height(3.dp))
 
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(6.dp)
-                                ) {
-                                    if (!hasUnreviewed) {
-                                        Text(
-                                            text = if (outOfStockCount > 0) "$outOfStockCount empty · ${totalAlerts - outOfStockCount} low stock · Tap to restock"
-                                            else "All $totalAlerts items acknowledged · Tap to view list",
-                                            style = MaterialTheme.typography.bodySmall.copy(
-                                                fontSize = 12.sp,
-                                                color = secondaryText
-                                            )
-                                        )
-                                    } else {
-                                        if (outOfStockCount > 0) {
-                                            Text(
-                                                text = "• $outOfStockCount out of stock",
-                                                style = MaterialTheme.typography.bodySmall.copy(
-                                                    fontSize = 12.sp,
-                                                    fontWeight = FontWeight.SemiBold,
-                                                    color = if (isDark) Color(0xFFFCA5A5) else Color(0xFFDC2626)
-                                                )
-                                            )
-                                        }
-                                        if (lowStockCount > 0) {
-                                            Text(
-                                                text = "• $lowStockCount low quantity (≤5)",
-                                                style = MaterialTheme.typography.bodySmall.copy(
-                                                    fontSize = 12.sp,
-                                                    fontWeight = FontWeight.Medium,
-                                                    color = if (isDark) Color(0xFFFDE68A) else Color(0xFFB45309)
-                                                )
-                                            )
-                                        }
-                                    }
-                                }
+                                Text(
+                                    text = when {
+                                        outOfStockCount > 0 && lowStockCount > 0 -> "$outOfStockCount out of stock · $lowStockCount low quantity"
+                                        outOfStockCount > 0 -> "$outOfStockCount items empty · Tap to restock"
+                                        else -> "$unreviewedAlertCount parts have low stock (≤5 units)"
+                                    },
+                                    style = MaterialTheme.typography.bodySmall.copy(
+                                        fontSize = 11.5.sp,
+                                        color = secondaryText
+                                    ),
+                                    maxLines = 1,
+                                    overflow = TextOverflow.Ellipsis
+                                )
                             }
 
+                            Spacer(Modifier.width(8.dp))
+
                             Surface(
-                                shape = RoundedCornerShape(10.dp),
-                                color = when {
-                                    !hasUnreviewed -> if (isDark) Color(0xFF232734) else Color(0xFFF1F3F9)
-                                    isCritical -> if (isDark) Color(0xFF451922) else Color(0xFFFFE4E6)
-                                    else -> if (isDark) Color(0xFF42280E) else Color(0xFFFEF3C7)
-                                }
+                                shape = RoundedCornerShape(8.dp),
+                                color = if (isCritical) (if (isDark) Color(0xFF451922) else Color(0xFFFFE4E6))
+                                        else (if (isDark) Color(0xFF42280E) else Color(0xFFFEF3C7))
                             ) {
                                 Row(
-                                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
+                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
                                     verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(3.dp)
+                                    horizontalArrangement = Arrangement.spacedBy(2.dp)
                                 ) {
                                     Text(
-                                        text = "View List",
+                                        text = "Review",
                                         style = MaterialTheme.typography.labelSmall.copy(
-                                            fontSize = 11.5.sp,
+                                            fontSize = 11.sp,
                                             fontWeight = FontWeight.Bold,
                                             color = alertAccent
                                         )
@@ -809,10 +774,16 @@ private fun TopMetricCard(
     cardBorder: Color,
     primaryText: Color,
     secondaryText: Color,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null
 ) {
     Card(
-        modifier = modifier.height(116.dp),
+        modifier = modifier
+            .height(116.dp)
+            .then(
+                if (onClick != null) Modifier.clip(RoundedCornerShape(16.dp)).clickable { onClick() }
+                else Modifier
+            ),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = cardBg),
         border = BorderStroke(1.dp, cardBorder),
