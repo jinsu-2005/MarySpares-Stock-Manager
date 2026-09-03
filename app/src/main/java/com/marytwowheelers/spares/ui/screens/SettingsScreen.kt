@@ -64,8 +64,10 @@ import com.marytwowheelers.spares.ui.components.SyncStatusIndicator
 import com.marytwowheelers.spares.ui.theme.ThemeMode
 import com.marytwowheelers.spares.ui.viewmodels.SettingsViewModel
 import com.marytwowheelers.spares.util.CsvExporter
+import android.os.Build
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -78,6 +80,21 @@ fun SettingsScreen(
     onLogout: () -> Unit
 ) {
     val context = LocalContext.current
+    val (appVersionName, appVersionCode) = remember {
+        try {
+            val pInfo = context.packageManager.getPackageInfo(context.packageName, 0)
+            val vName = pInfo.versionName ?: "1.0"
+            val vCode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                pInfo.longVersionCode.toString()
+            } else {
+                @Suppress("DEPRECATION")
+                pInfo.versionCode.toString()
+            }
+            Pair(vName, vCode)
+        } catch (e: Exception) {
+            Pair("1.0", "1")
+        }
+    }
     val auth = FirebaseAuth.getInstance()
     val user = auth.currentUser
     val scope = rememberCoroutineScope()
@@ -1321,6 +1338,44 @@ fun SettingsScreen(
                             }
                         }
                     }
+                }
+            }
+
+            // ─────────────────────────────────────────────
+            // 9. APP VERSION & COPYRIGHT FOOTER
+            // ─────────────────────────────────────────────
+            item {
+                Spacer(Modifier.height(8.dp))
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp, bottom = 24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Text(
+                        text = "Mary Two Wheelers Spares",
+                        style = MaterialTheme.typography.labelMedium.copy(
+                            fontWeight = FontWeight.SemiBold,
+                            color = primaryText.copy(alpha = 0.85f),
+                            fontSize = 12.5.sp
+                        )
+                    )
+                    Text(
+                        text = "Version $appVersionName · Build $appVersionCode",
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            fontSize = 11.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = secondaryText
+                        )
+                    )
+                    Text(
+                        text = "© ${Calendar.getInstance().get(Calendar.YEAR)} Mary Two Wheelers. All rights reserved.",
+                        style = MaterialTheme.typography.labelSmall.copy(
+                            fontSize = 10.5.sp,
+                            color = secondaryText.copy(alpha = 0.75f)
+                        )
+                    )
                 }
             }
         }
