@@ -58,10 +58,19 @@ class SyncWorker(
                             "updatedAt" to part.updatedAt,
                             "syncState" to SyncState.SYNCED.name
                         )
-                        firestore.collection("parts").document(part.id)
-                            .set(partMap)
-                            .await()
-                        partDao.updateSyncState(part.id, SyncState.SYNCED)
+                        try {
+                            firestore.collection("parts").document(part.id)
+                                .set(partMap)
+                                .await()
+                            partDao.updateSyncState(part.id, SyncState.SYNCED)
+                        } catch (e: com.google.firebase.firestore.FirebaseFirestoreException) {
+                            if (e.code == com.google.firebase.firestore.FirebaseFirestoreException.Code.PERMISSION_DENIED) {
+                                Log.w(TAG, "Permission denied pushing part ${part.id} (user lacks role permission). Reverting local sync state to unblock sync.")
+                                partDao.updateSyncState(part.id, SyncState.SYNCED)
+                            } else {
+                                throw e
+                            }
+                        }
                     }
 
                     // 2. PUSH: Push pending local Movements to shared 'movements' collection
@@ -79,10 +88,19 @@ class SyncWorker(
                             "timestamp" to movement.timestamp,
                             "syncState" to SyncState.SYNCED.name
                         )
-                        firestore.collection("movements").document(movement.id)
-                            .set(movementMap)
-                            .await()
-                        movementDao.updateSyncState(movement.id, SyncState.SYNCED)
+                        try {
+                            firestore.collection("movements").document(movement.id)
+                                .set(movementMap)
+                                .await()
+                            movementDao.updateSyncState(movement.id, SyncState.SYNCED)
+                        } catch (e: com.google.firebase.firestore.FirebaseFirestoreException) {
+                            if (e.code == com.google.firebase.firestore.FirebaseFirestoreException.Code.PERMISSION_DENIED) {
+                                Log.w(TAG, "Permission denied pushing movement ${movement.id} (user lacks role permission). Reverting local sync state to unblock sync.")
+                                movementDao.updateSyncState(movement.id, SyncState.SYNCED)
+                            } else {
+                                throw e
+                            }
+                        }
                     }
 
                     // 3. PULL: Pull remote Parts and merge with LWW (Last-Write-Wins based on updatedAt)
@@ -201,6 +219,10 @@ class SyncWorker(
 
     override suspend fun doWork(): Result {
         val success = performSync(applicationContext)
-        return if (success) Result.success() else Result.retry()
+        return if (success) {
+            Result.success()
+        } else {
+            if (runAttemptCount >= 3) Result.failure() else Result.retry()
+        }
     }
 }
