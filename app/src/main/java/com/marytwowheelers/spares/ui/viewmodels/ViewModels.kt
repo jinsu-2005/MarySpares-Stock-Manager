@@ -428,18 +428,6 @@ class SettingsViewModel(
                     )
                 ).await()
 
-                // Bootstrap Owner
-                firestore.collection("invitations").document("jinsukapgreen@gmail.com").set(
-                    hashMapOf(
-                        "email" to "jinsukapgreen@gmail.com",
-                        "name" to "Owner",
-                        "role" to UserRole.OWNER.name,
-                        "status" to "ACTIVE",
-                        "invitedBy" to "System Bootstrap",
-                        "createdAt" to System.currentTimeMillis()
-                    )
-                ).await()
-
                 kotlinx.coroutines.delay(300)
                 onSuccess(backupPathDescription)
             } catch (e: Exception) {

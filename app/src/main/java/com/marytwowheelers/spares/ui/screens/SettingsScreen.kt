@@ -110,7 +110,7 @@ fun SettingsScreen(
 
     // Role Capabilities
     val isUserAdmin = currentUserRole == UserRole.ADMIN || userEmail == "jinsu.j2005@gmail.com"
-    val isUserOwner = currentUserRole == UserRole.OWNER || userEmail == "jinsukapgreen@gmail.com"
+    val isUserOwner = currentUserRole == UserRole.OWNER
     val canManageUsers = isUserAdmin || isUserOwner || currentUserRole.canManageUsers
     val canClearHistory = isUserAdmin || isUserOwner || currentUserRole.canClearHistory
     val canResetLocalDb = isUserAdmin || isUserOwner || currentUserRole.canResetLocalDb
@@ -496,7 +496,7 @@ fun SettingsScreen(
                                     }
                                 } else {
                                     accessMembers.forEach { member ->
-                                        val isRootAccount = member.email.lowercase() == "jinsu.j2005@gmail.com" || member.email.lowercase() == "jinsukapgreen@gmail.com"
+                                        val isRootAccount = member.email.lowercase() == "jinsu.j2005@gmail.com"
 
                                         Surface(
                                             shape = RoundedCornerShape(12.dp),

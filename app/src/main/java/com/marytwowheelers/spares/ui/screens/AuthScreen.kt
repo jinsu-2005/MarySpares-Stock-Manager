@@ -911,8 +911,8 @@ fun AuthScreen(onAuthSuccess: () -> Unit) {
                                             return@launch
                                         }
 
-                                        // 3. Check if email is verified (allow root Admin/Owner or verified accounts)
-                                        val isRoot = cleanEmail == "jinsu.j2005@gmail.com" || cleanEmail == "jinsukapgreen@gmail.com"
+                                        // 3. Check if email is verified (allow root Admin or verified accounts)
+                                        val isRoot = cleanEmail == "jinsu.j2005@gmail.com"
                                         if (!currentUser.isEmailVerified && !isRoot) {
                                             pendingVerificationEmail = cleanEmail
                                             pendingVerificationName = currentUser.displayName ?: invitation.name

@@ -46,10 +46,6 @@ class AccessRepository(private val context: Context) {
             _currentUserRole.value = UserRole.ADMIN
             return
         }
-        if (email == "jinsukapgreen@gmail.com") {
-            _currentUserRole.value = UserRole.OWNER
-            return
-        }
         val cached = _members.value.find { it.email.lowercase() == email }
         if (cached != null) {
             _currentUserRole.value = cached.role
@@ -154,9 +150,6 @@ class AccessRepository(private val context: Context) {
         if (cleanEmail == "jinsu.j2005@gmail.com") {
             return AccessMember(id = cleanEmail, email = cleanEmail, name = "Admin", role = UserRole.ADMIN, isOwner = true)
         }
-        if (cleanEmail == "jinsukapgreen@gmail.com") {
-            return AccessMember(id = cleanEmail, email = cleanEmail, name = "Owner", role = UserRole.OWNER, isOwner = true)
-        }
         return try {
             val doc = firestore.collection("invitations").document(cleanEmail).get().await()
             if (doc.exists()) {
@@ -211,9 +204,9 @@ class AccessRepository(private val context: Context) {
 
     suspend fun removeMemberInvitation(emailOrId: String): Result<Unit> {
         val cleanEmail = emailOrId.lowercase().trim()
-        // Prevent deleting root Admin or root Owner
-        if (cleanEmail == "jinsu.j2005@gmail.com" || cleanEmail == "jinsukapgreen@gmail.com") {
-            return Result.failure(IllegalStateException("Root Admin and Root Owner accounts cannot be deleted."))
+        // Prevent deleting root Admin
+        if (cleanEmail == "jinsu.j2005@gmail.com") {
+            return Result.failure(IllegalStateException("Root Admin account cannot be deleted."))
         }
         return try {
             firestore.collection("invitations").document(cleanEmail).delete().await()
@@ -249,7 +242,7 @@ class AccessRepository(private val context: Context) {
     suspend fun provisionUserDocument(uid: String, email: String, displayName: String, authProvider: String): Result<UserRole> {
         val cleanEmail = email.lowercase().trim()
         val invitation = checkInvitation(cleanEmail)
-        val assignedRole = invitation?.role ?: if (cleanEmail == "jinsu.j2005@gmail.com") UserRole.ADMIN else if (cleanEmail == "jinsukapgreen@gmail.com") UserRole.OWNER else UserRole.STAFF
+        val assignedRole = invitation?.role ?: if (cleanEmail == "jinsu.j2005@gmail.com") UserRole.ADMIN else UserRole.STAFF
 
         return try {
             val userMap = hashMapOf(

@@ -15,10 +15,6 @@ service cloud.firestore {
       return isAuth() && userEmail() == 'jinsu.j2005@gmail.com';
     }
 
-    function isRootOwner() {
-      return isAuth() && userEmail() == 'jinsukapgreen@gmail.com';
-    }
-
     function hasUserDoc() {
       return isAuth() && exists(/databases/$(database)/documents/users/$(request.auth.uid));
     }
@@ -29,28 +25,16 @@ service cloud.firestore {
 
     function getUserRole() {
       return isRootAdmin() ? 'ADMIN' :
-             isRootOwner() ? 'OWNER' :
              hasUserDoc() ? getUserDoc().role : 'NONE';
     }
 
-    function isActiveUser() {
-      return isAuth() && (
-        isRootAdmin() ||
-        isRootOwner() ||
-        (hasUserDoc() && getUserDoc().status == 'ACTIVE')
-      );
-    }
 
     function isAdmin() {
       return isAuth() && (isRootAdmin() || getUserRole() == 'ADMIN');
     }
 
     function isOwnerOrAdmin() {
-      return isAuth() && (isRootAdmin() || isRootOwner() || getUserRole() == 'ADMIN' || getUserRole() == 'OWNER');
-    }
-
-    function isMember() {
-      return isAuth() && isActiveUser() && getUserRole() in ['ADMIN', 'OWNER', 'STAFF', 'RELATIVE', 'FRIEND'];
+      return isAuth() && (isRootAdmin() || getUserRole() == 'ADMIN' || getUserRole() == 'OWNER');
     }
 
     // 1. Invitations & Whitelist
