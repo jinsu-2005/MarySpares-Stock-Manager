@@ -252,12 +252,8 @@ class InventoryRepository(private val context: Context) {
         if (period == HistoryRetentionPeriod.NEVER) {
             return@withContext 0
         }
-        val cutoff = period.getCutoffTimestamp(customDays)
-        if (cutoff == null) {
-            movementDao.countAllMovements()
-        } else {
-            movementDao.countMovementsOlderThan(cutoff)
-        }
+        val cutoff = period.getCutoffTimestamp(customDays) ?: return@withContext 0
+        movementDao.countMovementsOlderThan(cutoff)
     }
 
     /**
@@ -274,12 +270,8 @@ class InventoryRepository(private val context: Context) {
             return@withContext Result.success(0)
         }
         try {
-            val cutoff = period.getCutoffTimestamp(customDays)
-            val movementsToDelete = if (cutoff == null) {
-                movementDao.getAllMovementsDirect()
-            } else {
-                movementDao.getMovementsOlderThan(cutoff)
-            }
+            val cutoff = period.getCutoffTimestamp(customDays) ?: return@withContext Result.success(0)
+            val movementsToDelete = movementDao.getMovementsOlderThan(cutoff)
 
             if (movementsToDelete.isEmpty()) {
                 return@withContext Result.success(0)
@@ -311,9 +303,9 @@ class InventoryRepository(private val context: Context) {
             for ((partId, partMovements) in groupedByPart) {
                 val sumDeletedDelta = partMovements.sumOf { it.delta }
                 if (sumDeletedDelta != 0) {
-                    val baselineTimestamp = cutoff ?: System.currentTimeMillis()
-                    val baselineReason = if (cutoff == null) {
-                        "Stock baseline (History cleared)"
+                    val baselineTimestamp = cutoff
+                    val baselineReason = if (period == HistoryRetentionPeriod.CUSTOM && customDays != null) {
+                        "Historical baseline (${customDays}d retention)"
                     } else {
                         "Historical baseline (${period.label})"
                     }

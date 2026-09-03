@@ -922,18 +922,33 @@ fun SettingsScreen(
                                             horizontalArrangement = Arrangement.SpaceBetween,
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
-                                            Text(
-                                                text = when {
-                                                    selectedRetentionPeriod == HistoryRetentionPeriod.NEVER -> "Never (Keep all)"
-                                                    selectedRetentionPeriod == HistoryRetentionPeriod.CUSTOM && customDaysInput.isNotBlank() -> "Custom (${customDaysInput}d)"
-                                                    else -> selectedRetentionPeriod.label
-                                                },
-                                                style = MaterialTheme.typography.bodyMedium.copy(
-                                                    fontWeight = FontWeight.SemiBold,
-                                                    color = primaryText,
-                                                    fontSize = 13.5.sp
+                                            Row(
+                                                verticalAlignment = Alignment.CenterVertically,
+                                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                                            ) {
+                                                Text(
+                                                    text = when {
+                                                        selectedRetentionPeriod == HistoryRetentionPeriod.NEVER -> "Never (Keep all)"
+                                                        selectedRetentionPeriod == HistoryRetentionPeriod.CUSTOM && customDaysInput.isNotBlank() -> "Custom (${customDaysInput}d)"
+                                                        else -> selectedRetentionPeriod.label
+                                                    },
+                                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                                        fontWeight = FontWeight.SemiBold,
+                                                        color = primaryText,
+                                                        fontSize = 13.5.sp
+                                                    )
                                                 )
-                                            )
+                                                if (selectedRetentionPeriod == HistoryRetentionPeriod.CUSTOM) {
+                                                    Icon(
+                                                        imageVector = Icons.Outlined.Edit,
+                                                        contentDescription = "Edit days",
+                                                        tint = accentColor,
+                                                        modifier = Modifier
+                                                            .size(15.dp)
+                                                            .clickable { showCustomDaysDialog = true }
+                                                    )
+                                                }
+                                            }
 
                                             Icon(
                                                 imageVector = Icons.Default.ArrowDropDown,
@@ -1899,9 +1914,142 @@ fun SettingsScreen(
     }
 
     // ─────────────────────────────────────────────
+    // CUSTOM DAYS DIALOG
+    // ─────────────────────────────────────────────
+    if (showCustomDaysDialog) {
+        var tempDaysInput by remember { mutableStateOf(customDaysInput.ifBlank { "30" }) }
+        val tempDays = tempDaysInput.toIntOrNull()
+        val isValid = tempDays != null && tempDays in 1..3650
+
+        AlertDialog(
+            onDismissRequest = { showCustomDaysDialog = false },
+            title = {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.DateRange,
+                        contentDescription = null,
+                        tint = accentColor
+                    )
+                    Text(
+                        text = "Custom History Retention",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp,
+                        color = primaryText
+                    )
+                }
+            },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Text(
+                        text = "Enter the number of days of history logs to retain. Logs older than this will be matched for clearing.",
+                        style = MaterialTheme.typography.bodySmall.copy(color = secondaryText)
+                    )
+
+                    OutlinedTextField(
+                        value = tempDaysInput,
+                        onValueChange = { input ->
+                            if (input.all { it.isDigit() } && input.length <= 4) {
+                                tempDaysInput = input
+                            }
+                        },
+                        label = { Text("Retention Duration") },
+                        placeholder = { Text("e.g. 30") },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = accentColor,
+                            focusedLabelColor = accentColor
+                        ),
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp),
+                        suffix = { Text("Days", color = secondaryText, fontSize = 12.sp) }
+                    )
+
+                    // Quick Preset Chips
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        listOf(7, 14, 30, 60, 180).forEach { days ->
+                            val isChipSelected = tempDaysInput == "$days"
+                            Surface(
+                                shape = RoundedCornerShape(8.dp),
+                                color = if (isChipSelected) (if (isDark) Color(0xFF2E2A48) else Color(0xFFEEF2FF)) else pillBg,
+                                border = BorderStroke(1.dp, if (isChipSelected) (if (isDark) Color(0xFF6366F1) else Color(0xFFC7D2FE)) else cardBorder),
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .clickable { tempDaysInput = "$days" }
+                            ) {
+                                Text(
+                                    text = "${days}d",
+                                    style = MaterialTheme.typography.labelSmall.copy(
+                                        fontSize = 11.sp,
+                                        fontWeight = if (isChipSelected) FontWeight.Bold else FontWeight.Medium,
+                                        color = if (isChipSelected) (if (isDark) Color(0xFFC4B5FD) else Color(0xFF4338CA)) else secondaryText
+                                    ),
+                                    modifier = Modifier.padding(vertical = 6.dp),
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        }
+                    }
+
+                    if (isValid) {
+                        val cutoffTime = System.currentTimeMillis() - (tempDays!!.toLong() * 24L * 60L * 60L * 1000L)
+                        val formattedDate = SimpleDateFormat("dd MMM yyyy", Locale.US).format(Date(cutoffTime))
+                        Text(
+                            text = "Logs created before $formattedDate will be deleted.",
+                            style = MaterialTheme.typography.labelSmall.copy(
+                                color = if (isDark) Color(0xFFFBBF24) else Color(0xFFD97706),
+                                fontWeight = FontWeight.Medium
+                            )
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        if (isValid) {
+                            customDaysInput = tempDaysInput
+                            selectedRetentionPeriod = HistoryRetentionPeriod.CUSTOM
+                            showCustomDaysDialog = false
+                        }
+                    },
+                    enabled = isValid,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (isDark) Color(0xFF6366F1) else Color(0xFF5046E5),
+                        contentColor = Color.White
+                    ),
+                    shape = RoundedCornerShape(10.dp)
+                ) {
+                    Text("Apply (${tempDaysInput}d)", fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showCustomDaysDialog = false }) {
+                    Text("Cancel", color = secondaryText)
+                }
+            },
+            containerColor = cardBg,
+            shape = RoundedCornerShape(22.dp)
+        )
+    }
+
+    // ─────────────────────────────────────────────
     // CLEAR HISTORY DIALOG
     // ─────────────────────────────────────────────
     if (showClearHistoryDialog) {
+        val periodLabel = if (selectedRetentionPeriod == HistoryRetentionPeriod.CUSTOM) {
+            "${customDaysInput} days"
+        } else {
+            selectedRetentionPeriod.label
+        }
+
         AlertDialog(
             onDismissRequest = { if (!isClearingHistory) showClearHistoryDialog = false },
             title = {
@@ -1912,7 +2060,7 @@ fun SettingsScreen(
             },
             text = {
                 Text(
-                    text = "Are you sure you want to permanently delete $matchingHistoryCount history log(s) older than ${selectedRetentionPeriod.label}? Current part quantities will NOT be affected.",
+                    text = "Are you sure you want to permanently delete $matchingHistoryCount history log(s) older than $periodLabel? Current part quantities will NOT be affected.",
                     style = MaterialTheme.typography.bodyMedium.copy(color = secondaryText)
                 )
             },
@@ -1931,6 +2079,7 @@ fun SettingsScreen(
                             },
                             onError = { err ->
                                 isClearingHistory = false
+                                showClearHistoryDialog = false
                                 scope.launch { snackbarHostState.showSnackbar("Failed: $err") }
                             }
                         )
