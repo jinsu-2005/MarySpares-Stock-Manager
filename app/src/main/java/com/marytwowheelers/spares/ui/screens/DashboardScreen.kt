@@ -599,7 +599,7 @@ fun DashboardScreen(
                                 ) {
                                     Text(
                                         text = when {
-                                            !hasUnreviewed -> "Stock Alerts Reviewed"
+                                            !hasUnreviewed -> "Low Stock Monitored"
                                             isCritical -> "Restock Required"
                                             else -> "Low Stock Alert"
                                         },
@@ -619,7 +619,7 @@ fun DashboardScreen(
                                         }
                                     ) {
                                         Text(
-                                            text = if (!hasUnreviewed) "$totalAlerts Tracked" else "$unreviewedAlertCount New",
+                                            text = if (!hasUnreviewed) "$totalAlerts Monitored (≤5)" else "$unreviewedAlertCount New",
                                             style = MaterialTheme.typography.labelSmall.copy(
                                                 fontSize = 10.5.sp,
                                                 fontWeight = FontWeight.Bold,
@@ -638,7 +638,8 @@ fun DashboardScreen(
                                 ) {
                                     if (!hasUnreviewed) {
                                         Text(
-                                            text = "All $totalAlerts alert items acknowledged • Tap to restock",
+                                            text = if (outOfStockCount > 0) "$outOfStockCount empty · ${totalAlerts - outOfStockCount} low stock · Tap to restock"
+                                            else "All $totalAlerts items acknowledged · Tap to view list",
                                             style = MaterialTheme.typography.bodySmall.copy(
                                                 fontSize = 12.sp,
                                                 color = secondaryText
@@ -657,7 +658,7 @@ fun DashboardScreen(
                                         }
                                         if (lowStockCount > 0) {
                                             Text(
-                                                text = "• $lowStockCount low quantity",
+                                                text = "• $lowStockCount low quantity (≤5)",
                                                 style = MaterialTheme.typography.bodySmall.copy(
                                                     fontSize = 12.sp,
                                                     fontWeight = FontWeight.Medium,
