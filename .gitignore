@@ -1,29 +1,62 @@
-*.iml
-.gradle
-/local.properties
-/.idea
-.idea/
-.DS_Store
-/build
+# Built application files
+*.apk
+*.ap_
+*.aab
+*.dex
+
+# Files for the ART/Dalvik VM
+*.class
+
+# Java / Gradle build
+.gradle/
 build/
 */build/
 captures/
 .externalNativeBuild
 .cxx
+
+# Local configuration file (sdk.dir, etc)
 local.properties
-.agents/
+/local.properties
+
+# Android Studio / IntelliJ IDEA
+*.iml
+.idea/
+/.idea
+*.ipr
+*.iws
+
+# VS Code & AI tooling
 .vscode/
 .kotlin/
+.agents/
+
+# System-specific files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+desktop.ini
 
 # Firebase & Google Services credentials
 google-services.json
 app/google-services.json
 
-# Signing credentials
+# Signing credentials & passwords
 *.keystore
 *.jks
 *.p12
+*.key
+*.pepk
+MarySpares
+/MarySpares
+Password MarySpares
+Password MarySpares*
+Password*
+*Password*
+*credentials*
+*secret*
 
-# Binaries & Distribution (use GitHub Releases)
+# Distribution & Release output directories
 apk/
-*.apk
+app/release/
+release/
