@@ -236,6 +236,18 @@ class InventoryRepository(private val context: Context) {
         }
     }
 
+    suspend fun deleteParts(partIds: List<String>) {
+        if (partIds.isEmpty()) return
+        withContext(Dispatchers.IO) {
+            partDao.softDeleteParts(
+                partIds = partIds,
+                updatedAt = System.currentTimeMillis(),
+                syncState = SyncState.PENDING
+            )
+            SyncManager.enqueueSync(context)
+        }
+    }
+
     suspend fun resetLocalData(autoResync: Boolean = true) {
         withContext(Dispatchers.IO) {
             database.clearAllTables()

@@ -4,8 +4,11 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -98,6 +101,18 @@ fun InventoryScreen(
     val focusManager = LocalFocusManager.current
     var isSearchFocused by remember { mutableStateOf(false) }
 
+    // Multi-select state
+    var isSelectionMode by remember { mutableStateOf(false) }
+    val selectedPartIds = remember { mutableStateListOf<String>() }
+    var showBulkDeleteConfirmDialog by remember { mutableStateOf(false) }
+    var isDeletingBulk by remember { mutableStateOf(false) }
+
+    // Intercept back button when in selection mode
+    BackHandler(enabled = isSelectionMode) {
+        isSelectionMode = false
+        selectedPartIds.clear()
+    }
+
     // Intercept back button when searching or focused
     BackHandler(enabled = searchQuery.isNotEmpty() || isSearchFocused || autoFocusSearch) {
         if (searchQuery.isNotEmpty()) {
@@ -172,77 +187,166 @@ fun InventoryScreen(
         containerColor = pageBg,
         snackbarHost = { AppSnackbarHost(snackbarHostState) },
         topBar = {
-            Surface(
-                color = pageBg,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .statusBarsPadding()
-                        .padding(start = 20.dp, end = 16.dp, top = 14.dp, bottom = 8.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Inventory",
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 22.sp,
-                            color = primaryText
-                        )
-                    )
-
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+            AnimatedContent(
+                targetState = isSelectionMode,
+                transitionSpec = {
+                    fadeIn(animationSpec = tween(180)) togetherWith fadeOut(animationSpec = tween(180))
+                },
+                label = "inventoryTopBar"
+            ) { inSelection ->
+                if (inSelection) {
+                    Surface(
+                        color = if (isDark) Color(0xFF1B1E26) else Color(0xFFF3F0FF),
+                        border = BorderStroke(1.dp, if (isDark) Color(0xFF2A2E3D) else Color(0xFFDDD6FE)),
+                        modifier = Modifier.fillMaxWidth()
                     ) {
-                        // Total parts count pill
-                        Surface(
-                            shape = CircleShape,
-                            color = if (isDark) Color(0xFF2E2A48) else Color(0xFFEFEBFA)
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .statusBarsPadding()
+                                .padding(start = 8.dp, end = 12.dp, top = 8.dp, bottom = 8.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(
-                                text = "${partsList.size} parts",
-                                style = MaterialTheme.typography.labelSmall.copy(
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.SemiBold,
-                                    color = if (isDark) Color(0xFFC4B5FD) else Color(0xFF5046E5)
-                                ),
-                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
-                            )
-                        }
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                IconButton(onClick = {
+                                    isSelectionMode = false
+                                    selectedPartIds.clear()
+                                }) {
+                                    Icon(
+                                        imageVector = Icons.Default.Close,
+                                        contentDescription = "Cancel Selection",
+                                        tint = primaryText
+                                    )
+                                }
 
-                        // Real Sync Status Indicator with Motion
-                        SyncStatusIndicator(
-                            syncStatus = syncStatus,
-                            isDark = isDark,
-                            onClick = { viewModel.triggerSync() }
-                        )
+                                Text(
+                                    text = "${selectedPartIds.size} Selected",
+                                    style = MaterialTheme.typography.titleMedium.copy(
+                                        fontWeight = FontWeight.Bold,
+                                        fontSize = 17.sp,
+                                        color = primaryText
+                                    )
+                                )
+                            }
 
-                        // Bell / Stock Alert Icon (Opens Stock Alert notification sheet, DOES NOT navigate to Add Part)
-                        IconButton(
-                            onClick = { showStockAlertDialog = true },
-                            modifier = Modifier.size(40.dp)
-                        ) {
-                            BadgedBox(
-                                badge = {
-                                    if (unreviewedAlertCount > 0) {
-                                        Badge(
-                                            containerColor = if (isDark) Color(0xFFEF4444) else Color(0xFFDC2626),
-                                            contentColor = Color.White
-                                        ) {
-                                            Text("$unreviewedAlertCount")
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(6.dp)
+                            ) {
+                                val allSelected = filteredAndSortedList.isNotEmpty() && selectedPartIds.size == filteredAndSortedList.size
+                                TextButton(
+                                    onClick = {
+                                        if (allSelected) {
+                                            selectedPartIds.clear()
+                                        } else {
+                                            selectedPartIds.clear()
+                                            selectedPartIds.addAll(filteredAndSortedList.map { it.part.id })
                                         }
                                     }
+                                ) {
+                                    Text(
+                                        text = if (allSelected) "Deselect All" else "Select All",
+                                        fontWeight = FontWeight.SemiBold,
+                                        color = if (isDark) Color(0xFFC4B5FD) else Color(0xFF4F46E5),
+                                        fontSize = 13.sp
+                                    )
                                 }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Outlined.Notifications,
-                                    contentDescription = "Stock Alerts",
-                                    tint = primaryText,
-                                    modifier = Modifier.size(24.dp)
+
+                                IconButton(
+                                    onClick = {
+                                        if (selectedPartIds.isNotEmpty()) {
+                                            showBulkDeleteConfirmDialog = true
+                                        }
+                                    },
+                                    enabled = selectedPartIds.isNotEmpty()
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.Delete,
+                                        contentDescription = "Bulk Delete",
+                                        tint = if (selectedPartIds.isNotEmpty()) Color(0xFFEF4444) else secondaryText.copy(alpha = 0.35f)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                } else {
+                    Surface(
+                        color = pageBg,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .statusBarsPadding()
+                                .padding(start = 20.dp, end = 16.dp, top = 14.dp, bottom = 8.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(
+                                text = "Inventory",
+                                style = MaterialTheme.typography.titleLarge.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 22.sp,
+                                    color = primaryText
                                 )
+                            )
+
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                // Total parts count pill
+                                Surface(
+                                    shape = CircleShape,
+                                    color = if (isDark) Color(0xFF2E2A48) else Color(0xFFEFEBFA)
+                                ) {
+                                    Text(
+                                        text = "${partsList.size} parts",
+                                        style = MaterialTheme.typography.labelSmall.copy(
+                                            fontSize = 12.sp,
+                                            fontWeight = FontWeight.SemiBold,
+                                            color = if (isDark) Color(0xFFC4B5FD) else Color(0xFF5046E5)
+                                        ),
+                                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp)
+                                    )
+                                }
+
+                                // Real Sync Status Indicator with Motion
+                                SyncStatusIndicator(
+                                    syncStatus = syncStatus,
+                                    isDark = isDark,
+                                    onClick = { viewModel.triggerSync() }
+                                )
+
+                                // Bell / Stock Alert Icon (Opens Stock Alert notification sheet, DOES NOT navigate to Add Part)
+                                IconButton(
+                                    onClick = { showStockAlertDialog = true },
+                                    modifier = Modifier.size(40.dp)
+                                ) {
+                                    BadgedBox(
+                                        badge = {
+                                            if (unreviewedAlertCount > 0) {
+                                                Badge(
+                                                    containerColor = if (isDark) Color(0xFFEF4444) else Color(0xFFDC2626),
+                                                    contentColor = Color.White
+                                                ) {
+                                                    Text("$unreviewedAlertCount")
+                                                }
+                                            }
+                                        }
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Outlined.Notifications,
+                                            contentDescription = "Stock Alerts",
+                                            tint = primaryText,
+                                            modifier = Modifier.size(24.dp)
+                                        )
+                                    }
+                                }
                             }
                         }
                     }
@@ -250,18 +354,20 @@ fun InventoryScreen(
             }
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = { showAddPartDialog = true },
-                containerColor = if (isDark) Color(0xFF5046E5) else Color(0xFF5046E5),
-                contentColor   = Color.White,
-                shape = CircleShape,
-                elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 4.dp, pressedElevation = 8.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Add New Part",
-                    modifier = Modifier.size(24.dp)
-                )
+            if (!isSelectionMode) {
+                FloatingActionButton(
+                    onClick = { showAddPartDialog = true },
+                    containerColor = if (isDark) Color(0xFF5046E5) else Color(0xFF5046E5),
+                    contentColor   = Color.White,
+                    shape = CircleShape,
+                    elevation = FloatingActionButtonDefaults.elevation(defaultElevation = 4.dp, pressedElevation = 8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Add New Part",
+                        modifier = Modifier.size(24.dp)
+                    )
+                }
             }
         }
     ) { innerPadding ->
@@ -396,7 +502,7 @@ fun InventoryScreen(
             }
 
             // ─────────────────────────────────────────────
-            // 3. PARTS COUNT & ENHANCED SORT BUTTON ROW
+            // 3. PARTS COUNT & ENHANCED SORT / SELECT BUTTON ROW
             // ─────────────────────────────────────────────
             Row(
                 modifier = Modifier
@@ -414,33 +520,73 @@ fun InventoryScreen(
                     )
                 )
 
-                Surface(
-                    shape = RoundedCornerShape(8.dp),
-                    color = pillBg,
-                    border = BorderStroke(1.dp, cardBorder),
-                    modifier = Modifier
-                        .clip(RoundedCornerShape(8.dp))
-                        .clickable { showSortSheet = true }
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    // Select Button
+                    Surface(
+                        shape = RoundedCornerShape(8.dp),
+                        color = if (isSelectionMode) (if (isDark) Color(0xFF2E2A48) else Color(0xFFEEF2FF)) else pillBg,
+                        border = BorderStroke(1.dp, if (isSelectionMode) (if (isDark) Color(0xFF6366F1) else Color(0xFFC7D2FE)) else cardBorder),
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable {
+                                isSelectionMode = !isSelectionMode
+                                if (!isSelectionMode) selectedPartIds.clear()
+                            }
                     ) {
-                        Icon(
-                            imageVector = selectedSort.icon,
-                            contentDescription = "Sort",
-                            tint = if (isDark) Color(0xFFC4B5FD) else Color(0xFF5046E5),
-                            modifier = Modifier.size(15.dp)
-                        )
-                        Text(
-                            text = "Sort: ${selectedSort.label}",
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                fontSize = 12.5.sp,
-                                color = primaryText,
-                                fontWeight = FontWeight.SemiBold
+                        Row(
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(5.dp)
+                        ) {
+                            Icon(
+                                imageVector = if (isSelectionMode) Icons.Default.Close else Icons.Outlined.Checklist,
+                                contentDescription = "Select",
+                                tint = if (isSelectionMode) (if (isDark) Color(0xFFC4B5FD) else Color(0xFF5046E5)) else secondaryText,
+                                modifier = Modifier.size(15.dp)
                             )
-                        )
+                            Text(
+                                text = if (isSelectionMode) "Done" else "Select",
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    fontSize = 12.5.sp,
+                                    color = if (isSelectionMode) (if (isDark) Color(0xFFC4B5FD) else Color(0xFF5046E5)) else primaryText,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            )
+                        }
+                    }
+
+                    // Sort Button
+                    Surface(
+                        shape = RoundedCornerShape(8.dp),
+                        color = pillBg,
+                        border = BorderStroke(1.dp, cardBorder),
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable { showSortSheet = true }
+                    ) {
+                        Row(
+                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp)
+                        ) {
+                            Icon(
+                                imageVector = selectedSort.icon,
+                                contentDescription = "Sort",
+                                tint = if (isDark) Color(0xFFC4B5FD) else Color(0xFF5046E5),
+                                modifier = Modifier.size(15.dp)
+                            )
+                            Text(
+                                text = "Sort: ${selectedSort.label}",
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    fontSize = 12.5.sp,
+                                    color = primaryText,
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            )
+                        }
                     }
                 }
             }
@@ -468,6 +614,7 @@ fun InventoryScreen(
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
                     items(filteredAndSortedList, key = { it.part.id }) { part ->
+                        val isPartSelected = selectedPartIds.contains(part.part.id)
                         InventoryPartCard(
                             part = part,
                             cardBg = cardBg,
@@ -476,6 +623,21 @@ fun InventoryScreen(
                             secondaryText = secondaryText,
                             pillBg = pillBg,
                             isDark = isDark,
+                            isSelectionMode = isSelectionMode,
+                            isSelected = isPartSelected,
+                            onToggleSelect = {
+                                if (isPartSelected) {
+                                    selectedPartIds.remove(part.part.id)
+                                } else {
+                                    selectedPartIds.add(part.part.id)
+                                }
+                            },
+                            onLongClick = {
+                                isSelectionMode = true
+                                if (!isPartSelected) {
+                                    selectedPartIds.add(part.part.id)
+                                }
+                            },
                             onClick = { onNavigateToPartDetails(part.part.id) }
                         )
                     }
@@ -538,6 +700,83 @@ fun InventoryScreen(
             }
         )
     }
+
+    // ─────────────────────────────────────────────
+    // BULK DELETE CONFIRMATION DIALOG
+    // ─────────────────────────────────────────────
+    if (showBulkDeleteConfirmDialog) {
+        AlertDialog(
+            onDismissRequest = { if (!isDeletingBulk) showBulkDeleteConfirmDialog = false },
+            title = {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.DeleteOutline,
+                        contentDescription = null,
+                        tint = Color(0xFFEF4444)
+                    )
+                    Text(
+                        text = "Delete ${selectedPartIds.size} Part${if (selectedPartIds.size > 1) "s" else ""}?",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 18.sp,
+                        color = primaryText
+                    )
+                }
+            },
+            text = {
+                Text(
+                    text = "Are you sure you want to permanently remove these ${selectedPartIds.size} parts from inventory? This action cannot be undone.",
+                    style = MaterialTheme.typography.bodyMedium.copy(color = secondaryText)
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        isDeletingBulk = true
+                        val count = selectedPartIds.size
+                        val ids = selectedPartIds.toList()
+                        viewModel.deleteParts(ids) {
+                            isDeletingBulk = false
+                            showBulkDeleteConfirmDialog = false
+                            isSelectionMode = false
+                            selectedPartIds.clear()
+                            scope.launch {
+                                snackbarHostState.showSnackbar("Deleted $count parts from inventory.")
+                            }
+                        }
+                    },
+                    enabled = !isDeletingBulk,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFFEF4444),
+                        contentColor = Color.White
+                    ),
+                    shape = RoundedCornerShape(10.dp)
+                ) {
+                    if (isDeletingBulk) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(16.dp),
+                            color = Color.White,
+                            strokeWidth = 2.dp
+                        )
+                        Spacer(Modifier.width(6.dp))
+                    }
+                    Text("Delete", fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { showBulkDeleteConfirmDialog = false },
+                    enabled = !isDeletingBulk
+                ) {
+                    Text("Cancel", color = secondaryText)
+                }
+            },
+            containerColor = cardBg,
+            shape = RoundedCornerShape(22.dp)
+        )
+    }
 }
 
 // ─────────────────────────────────────────────────────────
@@ -584,6 +823,7 @@ private fun InventorySegmentFilterChip(
 // ─────────────────────────────────────────────────────────
 // Sleek Inventory Part Card (with Serial Number & Pulsing Badge)
 // ─────────────────────────────────────────────────────────
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun InventoryPartCard(
     part: PartWithStock,
@@ -593,6 +833,10 @@ fun InventoryPartCard(
     secondaryText: Color,
     pillBg: Color,
     isDark: Boolean,
+    isSelectionMode: Boolean = false,
+    isSelected: Boolean = false,
+    onToggleSelect: () -> Unit = {},
+    onLongClick: () -> Unit = {},
     onClick: () -> Unit
 ) {
     val stock = part.currentStock
@@ -650,15 +894,29 @@ fun InventoryPartCard(
         else  -> secondaryText
     }
 
+    val selectedBorderColor = if (isDark) Color(0xFF818CF8) else Color(0xFF6366F1)
+    val selectedCardBg = if (isDark) Color(0xFF232038) else Color(0xFFF5F3FF)
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(18.dp))
-            .clickable(onClick = onClick),
+            .combinedClickable(
+                onClick = {
+                    if (isSelectionMode) {
+                        onToggleSelect()
+                    } else {
+                        onClick()
+                    }
+                },
+                onLongClick = {
+                    onLongClick()
+                }
+            ),
         shape = RoundedCornerShape(18.dp),
-        colors = CardDefaults.cardColors(containerColor = cardBg),
+        colors = CardDefaults.cardColors(containerColor = if (isSelected) selectedCardBg else cardBg),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
-        border = BorderStroke(1.dp, cardBorder)
+        border = BorderStroke(if (isSelected) 1.5.dp else 1.dp, if (isSelected) selectedBorderColor else cardBorder)
     ) {
         Row(
             modifier = Modifier
@@ -666,6 +924,35 @@ fun InventoryPartCard(
                 .padding(horizontal = 14.dp, vertical = 14.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // Selection Checkbox Circle
+            if (isSelectionMode) {
+                Box(
+                    modifier = Modifier
+                        .size(22.dp)
+                        .clip(CircleShape)
+                        .background(
+                            if (isSelected) (if (isDark) Color(0xFF6366F1) else Color(0xFF5046E5))
+                            else Color.Transparent
+                        )
+                        .border(
+                            width = if (isSelected) 0.dp else 1.5.dp,
+                            color = if (isSelected) Color.Transparent else secondaryText.copy(alpha = 0.45f),
+                            shape = CircleShape
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (isSelected) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(14.dp)
+                        )
+                    }
+                }
+                Spacer(Modifier.width(10.dp))
+            }
+
             // ─── 1. SERIAL NUMBER COLUMN (FAR LEFT) ───────
             Box(
                 modifier = Modifier.width(26.dp),

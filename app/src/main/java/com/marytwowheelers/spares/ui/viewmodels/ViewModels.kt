@@ -73,6 +73,13 @@ class InventoryViewModel(private val repository: InventoryRepository) : ViewMode
             repository.addPart(name, partNumber, shelfLocation, sellingPricePaise, mrpPaise, initialStock)
         }
     }
+
+    fun deleteParts(partIds: List<String>, onComplete: () -> Unit = {}) {
+        viewModelScope.launch {
+            repository.deleteParts(partIds)
+            onComplete()
+        }
+    }
 }
 
 class DashboardViewModel(private val repository: InventoryRepository) : ViewModel() {

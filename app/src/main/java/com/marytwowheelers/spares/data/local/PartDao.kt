@@ -42,6 +42,13 @@ interface PartDao {
         syncState: SyncState
     ): Int
 
+    @Query("UPDATE parts SET isDeleted = 1, updatedAt = :updatedAt, syncState = :syncState WHERE id IN (:partIds)")
+    suspend fun softDeleteParts(
+        partIds: List<String>,
+        updatedAt: Long,
+        syncState: SyncState
+    ): Int
+
     @Query("SELECT MAX(serialNumber) FROM parts WHERE isDeleted = 0")
     suspend fun getMaxSerialNumber(): Long?
 
