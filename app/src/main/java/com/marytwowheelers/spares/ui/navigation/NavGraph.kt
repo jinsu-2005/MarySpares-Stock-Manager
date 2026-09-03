@@ -43,8 +43,10 @@ fun MarySparesNavGraph(
         modifier         = modifier
     ) {
         composable(Screen.Auth.route) {
+            val context = androidx.compose.ui.platform.LocalContext.current
             AuthScreen(
                 onAuthSuccess = {
+                    com.marytwowheelers.spares.sync.SyncManager.enqueueSync(context)
                     navController.navigate(Screen.Dashboard.route) {
                         popUpTo(Screen.Auth.route) { inclusive = true }
                     }

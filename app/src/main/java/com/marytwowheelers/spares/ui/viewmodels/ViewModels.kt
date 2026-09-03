@@ -25,6 +25,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
 class InventoryViewModel(private val repository: InventoryRepository) : ViewModel() {
+    init {
+        repository.triggerSync()
+    }
+
     val syncStatus = repository.syncStatus.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
@@ -72,6 +76,10 @@ class InventoryViewModel(private val repository: InventoryRepository) : ViewMode
 }
 
 class DashboardViewModel(private val repository: InventoryRepository) : ViewModel() {
+    init {
+        repository.triggerSync()
+    }
+
     val partsList = repository.getAllPartsWithStock().stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
