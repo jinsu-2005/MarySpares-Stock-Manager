@@ -59,6 +59,7 @@ import com.marytwowheelers.spares.data.model.UserRole
 import com.marytwowheelers.spares.sync.AppSyncStatus
 import com.marytwowheelers.spares.sync.SyncManager
 import com.marytwowheelers.spares.ui.components.AppSnackbarHost
+import com.marytwowheelers.spares.ui.components.CloudWipeAnimationDialog
 import com.marytwowheelers.spares.ui.components.SyncStatusIndicator
 import com.marytwowheelers.spares.ui.theme.ThemeMode
 import com.marytwowheelers.spares.ui.viewmodels.SettingsViewModel
@@ -184,6 +185,8 @@ fun SettingsScreen(
     var showDeleteCloudDbDialog by remember { mutableStateOf(false) }
     var isExporting by remember { mutableStateOf(false) }
     var isCloudDeleting by remember { mutableStateOf(false) }
+    var isCloudDeleteComplete by remember { mutableStateOf(false) }
+    var cloudBackupSavedPath by remember { mutableStateOf<String?>(null) }
     var cloudDeleteStatus by remember { mutableStateOf<String?>(null) }
     var cloudDeleteError by remember { mutableStateOf<String?>(null) }
 
@@ -208,8 +211,10 @@ fun SettingsScreen(
     ) { uri: Uri? ->
         if (uri != null) {
             isCloudDeleting = true
+            isCloudDeleteComplete = false
+            cloudBackupSavedPath = null
             cloudDeleteError = null
-            cloudDeleteStatus = "Preparing data export..."
+            cloudDeleteStatus = "Writing full ZIP backup to selected location..."
 
             viewModel.deleteEntireCloudDatabase(
                 context = context,
@@ -219,10 +224,9 @@ fun SettingsScreen(
                 },
                 onSuccess = { backupPath ->
                     isCloudDeleting = false
-                    showDeleteCloudDbDialog = false
-                    scope.launch {
-                        snackbarHostState.showSnackbar("Cloud & Local Database wiped. Backup ZIP saved to chosen folder.")
-                    }
+                    isCloudDeleteComplete = true
+                    cloudBackupSavedPath = backupPath
+                    cloudDeleteStatus = "Cloud & Local Database Successfully Wiped!"
                 },
                 onError = { err ->
                     isCloudDeleting = false
@@ -1793,18 +1797,30 @@ fun SettingsScreen(
     }
 
     // ─────────────────────────────────────────────
-    // DELETE ENTIRE CLOUD DATABASE DIALOG (ADMIN ONLY WITH STRICT CSV BACKUP & KEYWORD CONFIRMATION)
     // ─────────────────────────────────────────────
-    if (showDeleteCloudDbDialog) {
+    // DELETE ENTIRE CLOUD DATABASE DIALOG & ANIMATION
+    // ─────────────────────────────────────────────
+    if (isCloudDeleting || isCloudDeleteComplete || (cloudDeleteError != null && showDeleteCloudDbDialog)) {
+        CloudWipeAnimationDialog(
+            statusText = cloudDeleteStatus,
+            isComplete = isCloudDeleteComplete,
+            errorMessage = cloudDeleteError,
+            backupDestination = cloudBackupSavedPath,
+            onDismiss = {
+                isCloudDeleting = false
+                isCloudDeleteComplete = false
+                cloudDeleteStatus = null
+                cloudDeleteError = null
+                showDeleteCloudDbDialog = false
+            }
+        )
+    } else if (showDeleteCloudDbDialog) {
         var confirmationInput by remember { mutableStateOf("") }
-        var isCloudDeleting by remember { mutableStateOf(false) }
-        var cloudDeleteStatus by remember { mutableStateOf<String?>(null) }
-        var cloudDeleteError by remember { mutableStateOf<String?>(null) }
         val requiredKeyword = "DELETE ENTIRE CLOUD DATABASE"
         val isKeywordMatch = confirmationInput.trim() == requiredKeyword
 
         AlertDialog(
-            onDismissRequest = { if (!isCloudDeleting) showDeleteCloudDbDialog = false },
+            onDismissRequest = { showDeleteCloudDbDialog = false },
             title = {
                 Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     Icon(Icons.Default.Warning, null, tint = Color(0xFFDC2626), modifier = Modifier.size(26.dp))
@@ -1828,7 +1844,7 @@ fun SettingsScreen(
                                 style = MaterialTheme.typography.bodySmall.copy(fontWeight = FontWeight.Bold, color = Color(0xFFDC2626), fontSize = 12.sp)
                             )
                             Text(
-                                text = "1. An export of all Firestore data as CSV will be saved directly to your device storage before deletion.\n2. Cloud deletion will only proceed if the local backup is verified.",
+                                text = "1. An export of all Firestore data as a full ZIP archive will be saved directly to your chosen folder before deletion.\n2. Cloud deletion will only proceed if the backup is verified.",
                                 style = MaterialTheme.typography.bodySmall.copy(color = if (isDark) Color(0xFFFCA5A5) else Color(0xFF991B1B), fontSize = 11.5.sp)
                             )
                         }
@@ -1841,7 +1857,7 @@ fun SettingsScreen(
 
                     OutlinedTextField(
                         value = confirmationInput,
-                        onValueChange = { confirmationInput = it; cloudDeleteError = null },
+                        onValueChange = { confirmationInput = it },
                         placeholder = { Text(requiredKeyword, color = secondaryText.copy(alpha = 0.5f)) },
                         singleLine = true,
                         shape = RoundedCornerShape(10.dp),
@@ -1849,20 +1865,8 @@ fun SettingsScreen(
                             focusedBorderColor = Color(0xFFDC2626),
                             unfocusedBorderColor = cardBorder
                         ),
-                        modifier = Modifier.fillMaxWidth(),
-                        enabled = !isCloudDeleting
+                        modifier = Modifier.fillMaxWidth()
                     )
-
-                    cloudDeleteStatus?.let {
-                        Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                            CircularProgressIndicator(modifier = Modifier.size(16.dp), color = Color(0xFFDC2626), strokeWidth = 2.dp)
-                            Text(text = it, style = MaterialTheme.typography.bodySmall.copy(color = accentColor, fontSize = 11.5.sp))
-                        }
-                    }
-
-                    cloudDeleteError?.let {
-                        Text(text = it, style = MaterialTheme.typography.bodySmall.copy(color = Color(0xFFDC2626), fontWeight = FontWeight.Bold, fontSize = 12.sp))
-                    }
                 }
             },
             confirmButton = {
@@ -1873,17 +1877,19 @@ fun SettingsScreen(
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFFDC2626), contentColor = Color.White),
                     shape = RoundedCornerShape(10.dp),
-                    enabled = isKeywordMatch && !isCloudDeleting
+                    enabled = isKeywordMatch
                 ) {
-                    if (isCloudDeleting) {
-                        CircularProgressIndicator(modifier = Modifier.size(16.dp), color = Color.White, strokeWidth = 2.dp)
-                        Spacer(Modifier.width(6.dp))
-                    }
+                    Icon(
+                        imageVector = Icons.Outlined.FolderZip,
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp)
+                    )
+                    Spacer(Modifier.width(6.dp))
                     Text("Choose Location & Wipe Database", fontWeight = FontWeight.Bold, fontSize = 12.5.sp)
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showDeleteCloudDbDialog = false }, enabled = !isCloudDeleting) {
+                TextButton(onClick = { showDeleteCloudDbDialog = false }) {
                     Text("Cancel", color = secondaryText)
                 }
             },

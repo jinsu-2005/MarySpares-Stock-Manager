@@ -380,6 +380,7 @@ class SettingsViewModel(
                 }
 
                 onProgress("Backup verified. Deleting Firestore cloud collections...")
+                kotlinx.coroutines.delay(400)
 
                 // Delete all documents in parts
                 for (doc in partsSnap.documents) {
@@ -401,11 +402,13 @@ class SettingsViewModel(
                     doc.reference.delete().await()
                 }
 
-                onProgress("Wiping local database cache & reset stock alerts...")
+                onProgress("Wiping local database cache & resetting alert indices...")
+                kotlinx.coroutines.delay(400)
                 repository.resetLocalData(autoResync = false)
                 StockAlertManager.clearAllReviewed(context)
 
                 onProgress("Re-bootstrapping initial Admin & Owner accounts...")
+                kotlinx.coroutines.delay(400)
                 // Bootstrap Admin
                 firestore.collection("invitations").document("jinsu.j2005@gmail.com").set(
                     hashMapOf(
@@ -430,6 +433,7 @@ class SettingsViewModel(
                     )
                 ).await()
 
+                kotlinx.coroutines.delay(300)
                 onSuccess(backupPathDescription)
             } catch (e: Exception) {
                 onError("Cloud deletion failed: ${e.localizedMessage}")
