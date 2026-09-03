@@ -19,7 +19,7 @@ import kotlinx.coroutines.tasks.await
 import org.json.JSONArray
 import org.json.JSONObject
 
-class AccessRepository(private val context: Context) {
+class AccessRepository private constructor(private val context: Context) {
     private val prefs: SharedPreferences = context.getSharedPreferences("access_members_prefs_v2", Context.MODE_PRIVATE)
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
@@ -28,20 +28,88 @@ class AccessRepository(private val context: Context) {
     private val _members = MutableStateFlow<List<AccessMember>>(emptyList())
     val members: StateFlow<List<AccessMember>> = _members.asStateFlow()
 
-    private val _currentUserRole = MutableStateFlow(UserRole.STAFF)
+    private val _currentUserRole = MutableStateFlow(UserRole.VIEWER)
     val currentUserRole: StateFlow<UserRole> = _currentUserRole.asStateFlow()
 
     private var invitationsListener: ListenerRegistration? = null
+    private var userDocListener: ListenerRegistration? = null
+
+    companion object {
+        @Volatile
+        private var INSTANCE: AccessRepository? = null
+
+        fun getInstance(context: Context): AccessRepository {
+            return INSTANCE ?: synchronized(this) {
+                INSTANCE ?: AccessRepository(context.applicationContext).also { INSTANCE = it }
+            }
+        }
+    }
 
     init {
         loadCachedMembers()
-        evaluateCurrentUserRole()
+        val initialUser = auth.currentUser
+        handleAuthStateChanged(initialUser)
+
+        auth.addAuthStateListener { firebaseAuth ->
+            handleAuthStateChanged(firebaseAuth.currentUser)
+        }
+    }
+
+    private fun handleAuthStateChanged(user: com.google.firebase.auth.FirebaseUser?) {
+        if (user == null) {
+            userDocListener?.remove()
+            userDocListener = null
+            invitationsListener?.remove()
+            invitationsListener = null
+            _currentUserRole.value = UserRole.VIEWER
+            return
+        }
+
+        val email = user.email?.lowercase()?.trim() ?: ""
+        if (email == "jinsu.j2005@gmail.com") {
+            _currentUserRole.value = UserRole.ADMIN
+        } else {
+            val cachedRole = prefs.getString("role_${user.uid}", null)
+            if (cachedRole != null) {
+                _currentUserRole.value = UserRole.fromString(cachedRole)
+            } else {
+                _currentUserRole.value = UserRole.VIEWER
+            }
+        }
+
+        attachUserDocListener(user.uid, email)
         startFirestoreListener()
     }
 
+    private fun attachUserDocListener(uid: String, email: String) {
+        userDocListener?.remove()
+        try {
+            userDocListener = firestore.collection("users").document(uid)
+                .addSnapshotListener { snapshot, error ->
+                    if (error != null) {
+                        Log.e("AccessRepository", "Error listening to /users/$uid", error)
+                        return@addSnapshotListener
+                    }
+                    if (snapshot != null && snapshot.exists()) {
+                        val roleStr = snapshot.getString("role")
+                        val role = UserRole.fromString(roleStr)
+                        if (email != "jinsu.j2005@gmail.com") {
+                            _currentUserRole.value = role
+                            prefs.edit().putString("role_$uid", role.name).apply()
+                        }
+                    } else {
+                        // If no /users/{uid} document yet, evaluate from cached or invitations
+                        evaluateCurrentUserRole()
+                    }
+                }
+        } catch (e: Exception) {
+            Log.e("AccessRepository", "Failed to attach user doc listener", e)
+        }
+    }
+
     private fun evaluateCurrentUserRole() {
-        val user = auth.currentUser
-        val email = user?.email?.lowercase()?.trim() ?: ""
+        val user = auth.currentUser ?: return
+        val email = user.email?.lowercase()?.trim() ?: ""
         if (email == "jinsu.j2005@gmail.com") {
             _currentUserRole.value = UserRole.ADMIN
             return
@@ -49,10 +117,12 @@ class AccessRepository(private val context: Context) {
         val cached = _members.value.find { it.email.lowercase() == email }
         if (cached != null) {
             _currentUserRole.value = cached.role
+            prefs.edit().putString("role_${user.uid}", cached.role.name).apply()
         }
     }
 
     fun startFirestoreListener() {
+        if (auth.currentUser == null) return
         invitationsListener?.remove()
         try {
             invitationsListener = firestore.collection("invitations")
@@ -93,6 +163,15 @@ class AccessRepository(private val context: Context) {
         } catch (e: Exception) {
             Log.e("AccessRepository", "Failed to attach snapshot listener", e)
         }
+    }
+
+    fun clearSession() {
+        userDocListener?.remove()
+        userDocListener = null
+        invitationsListener?.remove()
+        invitationsListener = null
+        _currentUserRole.value = UserRole.VIEWER
+        _members.value = emptyList()
     }
 
     private fun loadCachedMembers() {
@@ -232,6 +311,14 @@ class AccessRepository(private val context: Context) {
         }
         return try {
             firestore.collection("invitations").document(cleanEmail).update("role", newRole.name).await()
+            try {
+                val userDocs = firestore.collection("users").whereEqualTo("email", cleanEmail).get().await()
+                for (doc in userDocs.documents) {
+                    doc.reference.update("role", newRole.name).await()
+                }
+            } catch (ignored: Exception) {
+                // Ignore if user has not yet signed in or profile update fails
+            }
             val updated = _members.value.map {
                 if (it.email.lowercase() == cleanEmail || it.id == cleanEmail) {
                     it.copy(role = newRole, isOwner = (newRole == UserRole.OWNER || newRole == UserRole.ADMIN))
@@ -248,7 +335,7 @@ class AccessRepository(private val context: Context) {
     suspend fun provisionUserDocument(uid: String, email: String, displayName: String, authProvider: String): Result<UserRole> {
         val cleanEmail = email.lowercase().trim()
         val invitation = checkInvitation(cleanEmail)
-        val assignedRole = invitation?.role ?: if (cleanEmail == "jinsu.j2005@gmail.com") UserRole.ADMIN else UserRole.STAFF
+        val assignedRole = invitation?.role ?: if (cleanEmail == "jinsu.j2005@gmail.com") UserRole.ADMIN else UserRole.VIEWER
 
         return try {
             val userMap = hashMapOf(
@@ -262,6 +349,7 @@ class AccessRepository(private val context: Context) {
             )
             firestore.collection("users").document(uid).set(userMap).await()
             _currentUserRole.value = assignedRole
+            prefs.edit().putString("role_$uid", assignedRole.name).apply()
             Result.success(assignedRole)
         } catch (e: Exception) {
             _currentUserRole.value = assignedRole

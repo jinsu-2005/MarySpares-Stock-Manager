@@ -2156,6 +2156,7 @@ fun SettingsScreen(
                     ),
                     onClick = {
                         showLogoutDialog = false
+                        com.marytwowheelers.spares.data.repository.AccessRepository.getInstance(context).clearSession()
                         auth.signOut()
                         googleSignInClient.signOut().addOnCompleteListener {
                             onLogout()

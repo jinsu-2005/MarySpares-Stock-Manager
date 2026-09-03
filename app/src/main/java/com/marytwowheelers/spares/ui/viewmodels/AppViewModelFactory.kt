@@ -7,7 +7,7 @@ import com.marytwowheelers.spares.data.repository.InventoryRepository
 
 class AppViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
     private val repository = InventoryRepository(context.applicationContext)
-    private val accessRepository = com.marytwowheelers.spares.data.repository.AccessRepository(context.applicationContext)
+    private val accessRepository = com.marytwowheelers.spares.data.repository.AccessRepository.getInstance(context.applicationContext)
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(InventoryViewModel::class.java)) {

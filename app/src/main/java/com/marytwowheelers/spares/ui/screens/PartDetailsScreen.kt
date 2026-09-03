@@ -715,7 +715,7 @@ fun PartDetailsScreen(
     // ─────────────────────────────────────────────
     // EDIT PART DIALOG
     // ─────────────────────────────────────────────
-    if (showEditDialog && partWithStock != null) {
+    if (showEditDialog && partWithStock != null && currentUserRole.canEditParts) {
         val currentPart = partWithStock!!.part
         EditPartDialog(
             part = currentPart,
@@ -733,7 +733,7 @@ fun PartDetailsScreen(
     // ─────────────────────────────────────────────
     // DELETE / ARCHIVE CONFIRMATION
     // ─────────────────────────────────────────────
-    if (showDeleteConfirm && partWithStock != null) {
+    if (showDeleteConfirm && partWithStock != null && currentUserRole.canDeleteParts) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirm = false },
             title = {

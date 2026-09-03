@@ -35,7 +35,7 @@ class InventoryViewModel(
     val currentUserRole: StateFlow<UserRole> = accessRepository.currentUserRole.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
-        initialValue = UserRole.STAFF
+        initialValue = accessRepository.currentUserRole.value
     )
 
     val syncStatus = repository.syncStatus.stateIn(
@@ -78,12 +78,14 @@ class InventoryViewModel(
         mrpPaise: Long,
         initialStock: Int
     ) {
+        if (!currentUserRole.value.canAddParts) return
         viewModelScope.launch {
             repository.addPart(name, partNumber, shelfLocation, sellingPricePaise, mrpPaise, initialStock)
         }
     }
 
     fun deleteParts(partIds: List<String>, onComplete: () -> Unit = {}) {
+        if (!currentUserRole.value.canDeleteParts) return
         viewModelScope.launch {
             repository.deleteParts(partIds)
             onComplete()
@@ -102,7 +104,7 @@ class DashboardViewModel(
     val currentUserRole: StateFlow<UserRole> = accessRepository.currentUserRole.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
-        initialValue = UserRole.STAFF
+        initialValue = accessRepository.currentUserRole.value
     )
 
     val partsList = repository.getAllPartsWithStock().stateIn(
@@ -129,12 +131,14 @@ class DashboardViewModel(
         mrpPaise: Long,
         initialStock: Int
     ) {
+        if (!currentUserRole.value.canAddParts) return
         viewModelScope.launch {
             repository.addPart(name, partNumber, shelfLocation, sellingPricePaise, mrpPaise, initialStock)
         }
     }
 
     fun recordMovement(partId: String, delta: Int, type: MovementType, reason: String? = null) {
+        if (!currentUserRole.value.canAdjustStock) return
         viewModelScope.launch {
             repository.recordMovement(partId, delta, type, reason)
         }
@@ -150,7 +154,7 @@ class PartDetailsViewModel(
     val currentUserRole: StateFlow<UserRole> = accessRepository.currentUserRole.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
-        initialValue = UserRole.STAFF
+        initialValue = accessRepository.currentUserRole.value
     )
 
     val syncStatus = repository.syncStatus.stateIn(
@@ -192,6 +196,7 @@ class PartDetailsViewModel(
     }
 
     fun recordMovement(delta: Int, type: MovementType, reason: String? = null) {
+        if (!currentUserRole.value.canAdjustStock) return
         val id = _partId.value ?: return
         viewModelScope.launch {
             repository.recordMovement(id, delta, type, reason)
@@ -199,6 +204,7 @@ class PartDetailsViewModel(
     }
 
     fun recordAdjustment(targetPhysicalCount: Int, reason: String? = null) {
+        if (!currentUserRole.value.canEditParts) return
         val id = _partId.value ?: return
         viewModelScope.launch {
             repository.recordAdjustment(id, targetPhysicalCount, reason)
@@ -212,6 +218,7 @@ class PartDetailsViewModel(
         sellingPricePaise: Long,
         mrpPaise: Long
     ) {
+        if (!currentUserRole.value.canEditParts) return
         val id = _partId.value ?: return
         viewModelScope.launch {
             repository.updatePartMetadata(id, name, partNumber, shelfLocation, sellingPricePaise, mrpPaise)
@@ -219,6 +226,7 @@ class PartDetailsViewModel(
     }
 
     fun deletePart(onDeleted: () -> Unit) {
+        if (!currentUserRole.value.canDeleteParts) return
         val id = _partId.value ?: return
         viewModelScope.launch {
             repository.deletePart(id)
@@ -266,7 +274,7 @@ class SettingsViewModel(
     val currentUserRole: StateFlow<UserRole> = accessRepository.currentUserRole.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
-        initialValue = UserRole.STAFF
+        initialValue = accessRepository.currentUserRole.value
     )
 
     fun triggerSync() {

@@ -674,7 +674,7 @@ fun InventoryScreen(
     // ─────────────────────────────────────────────
     // ADD PART DIALOG
     // ─────────────────────────────────────────────
-    if (showAddPartDialog) {
+    if (showAddPartDialog && currentUserRole.canAddParts) {
         AddPartDialog(
             onDismiss = { showAddPartDialog = false },
             onConfirm = { name, partNumber, shelf, sp, mrp, stock ->

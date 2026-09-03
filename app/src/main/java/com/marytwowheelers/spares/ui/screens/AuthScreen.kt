@@ -66,7 +66,7 @@ fun AuthScreen(onAuthSuccess: () -> Unit) {
     val focusManager = LocalFocusManager.current
     val auth = remember { FirebaseAuth.getInstance() }
     val firestore = remember { FirebaseFirestore.getInstance() }
-    val accessRepo = remember { AccessRepository(context.applicationContext) }
+    val accessRepo = remember { AccessRepository.getInstance(context.applicationContext) }
     val scope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
 
