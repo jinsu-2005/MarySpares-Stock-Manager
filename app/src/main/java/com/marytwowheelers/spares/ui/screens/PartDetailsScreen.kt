@@ -55,6 +55,7 @@ fun PartDetailsScreen(
     val partWithStock by viewModel.partDetails.collectAsState()
     val movements     by viewModel.movements.collectAsState()
     val syncStatus    by viewModel.syncStatus.collectAsState()
+    val currentUserRole by viewModel.currentUserRole.collectAsState()
 
     val scope = rememberCoroutineScope()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -125,22 +126,26 @@ fun PartDetailsScreen(
                             onClick = { viewModel.triggerSync() }
                         )
 
-                        // Edit Part Button
-                        IconButton(onClick = { showEditDialog = true }) {
-                            Icon(
-                                imageVector = Icons.Outlined.Edit,
-                                contentDescription = "Edit Part",
-                                tint = if (isDark) Color(0xFFC4B5FD) else Color(0xFF5046E5)
-                            )
+                        // Edit Part Button (Only Owner / Admin)
+                        if (currentUserRole.canEditParts) {
+                            IconButton(onClick = { showEditDialog = true }) {
+                                Icon(
+                                    imageVector = Icons.Outlined.Edit,
+                                    contentDescription = "Edit Part",
+                                    tint = if (isDark) Color(0xFFC4B5FD) else Color(0xFF5046E5)
+                                )
+                            }
                         }
 
-                        // Delete / Archive Button
-                        IconButton(onClick = { showDeleteConfirm = true }) {
-                            Icon(
-                                imageVector = Icons.Outlined.DeleteOutline,
-                                contentDescription = "Delete Part",
-                                tint = if (isDark) Color(0xFFFCA5A5) else Color(0xFFEF4444)
-                            )
+                        // Delete / Archive Button (Only Owner / Admin)
+                        if (currentUserRole.canDeleteParts) {
+                            IconButton(onClick = { showDeleteConfirm = true }) {
+                                Icon(
+                                    imageVector = Icons.Outlined.DeleteOutline,
+                                    contentDescription = "Delete Part",
+                                    tint = if (isDark) Color(0xFFFCA5A5) else Color(0xFFEF4444)
+                                )
+                            }
                         }
                     }
                 }
@@ -466,11 +471,11 @@ fun PartDetailsScreen(
                 }
 
                 // ─────────────────────────────────────────────
-                // 2. STOCK ACTIONS SYSTEM (2x2 GRID)
+                // 2. STOCK ACTIONS SYSTEM
                 // ─────────────────────────────────────────────
                 item {
                     Text(
-                        text = "Stock Actions",
+                        text = if (currentUserRole.isReadOnly) "Stock Permissions" else "Stock Actions",
                         style = MaterialTheme.typography.titleSmall.copy(
                             fontWeight = FontWeight.Bold,
                             fontSize = 15.sp,
@@ -481,77 +486,130 @@ fun PartDetailsScreen(
                 }
 
                 item {
-                    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                        // Row 1: Add Stock & Remove Stock
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    if (currentUserRole.isReadOnly) {
+                        Surface(
+                            shape = RoundedCornerShape(16.dp),
+                            color = cardBg,
+                            border = BorderStroke(1.dp, cardBorder),
+                            modifier = Modifier.fillMaxWidth()
                         ) {
-                            // ADD STOCK
-                            PartStockActionTile(
-                                title = "Add Stock",
-                                subtitle = "",
-                                icon = Icons.Outlined.AddCircleOutline,
-                                iconBg = if (isDark) Color(0xFF064E3B) else Color(0xFFDCFCE7),
-                                iconTint = if (isDark) Color(0xFF34D399) else Color(0xFF059669),
-                                cardBg = cardBg,
-                                cardBorder = cardBorder,
-                                primaryText = primaryText,
-                                secondaryText = secondaryText,
-                                onClick = { activeActionType = MovementType.ADD },
-                                modifier = Modifier.weight(1f)
-                            )
-
-                            // REMOVE STOCK
-                            PartStockActionTile(
-                                title = "Remove Stock",
-                                subtitle = "",
-                                icon = Icons.Outlined.RemoveCircleOutline,
-                                iconBg = if (isDark) Color(0xFF38141B) else Color(0xFFFEE2E2),
-                                iconTint = if (isDark) Color(0xFFFB7185) else Color(0xFFDC2626),
-                                cardBg = cardBg,
-                                cardBorder = cardBorder,
-                                primaryText = primaryText,
-                                secondaryText = secondaryText,
-                                onClick = { activeActionType = MovementType.REMOVE },
-                                modifier = Modifier.weight(1f)
-                            )
+                            Row(
+                                modifier = Modifier.padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(14.dp)
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(42.dp)
+                                        .background(
+                                            color = if (isDark) Color(0xFF262B3A) else Color(0xFFE2E8F0),
+                                            shape = CircleShape
+                                        ),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.Lock,
+                                        contentDescription = null,
+                                        tint = secondaryText,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = "Read-Only Access",
+                                        style = MaterialTheme.typography.bodyMedium.copy(
+                                            fontWeight = FontWeight.Bold,
+                                            color = primaryText
+                                        )
+                                    )
+                                    Spacer(Modifier.height(2.dp))
+                                    Text(
+                                        text = "Viewers have read-only access. You can view parts and search shelf locations, but cannot modify stock.",
+                                        style = MaterialTheme.typography.bodySmall.copy(
+                                            color = secondaryText,
+                                            fontSize = 12.sp
+                                        )
+                                    )
+                                }
+                            }
                         }
+                    } else {
+                        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+                            // Row 1: Add Stock & Remove Stock
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                            ) {
+                                // ADD STOCK
+                                PartStockActionTile(
+                                    title = "Add Stock",
+                                    subtitle = "",
+                                    icon = Icons.Outlined.AddCircleOutline,
+                                    iconBg = if (isDark) Color(0xFF064E3B) else Color(0xFFDCFCE7),
+                                    iconTint = if (isDark) Color(0xFF34D399) else Color(0xFF059669),
+                                    cardBg = cardBg,
+                                    cardBorder = cardBorder,
+                                    primaryText = primaryText,
+                                    secondaryText = secondaryText,
+                                    onClick = { activeActionType = MovementType.ADD },
+                                    modifier = Modifier.weight(1f)
+                                )
 
-                        // Row 2: Return & Adjust Count
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(10.dp)
-                        ) {
-                            // RETURN
-                            PartStockActionTile(
-                                title = "Return",
-                                subtitle = "",
-                                icon = Icons.Outlined.RotateLeft,
-                                iconBg = if (isDark) Color(0xFF2E2A48) else Color(0xFFEFEBFA),
-                                iconTint = if (isDark) Color(0xFFC4B5FD) else Color(0xFF4F46E5),
-                                cardBg = cardBg,
-                                cardBorder = cardBorder,
-                                primaryText = primaryText,
-                                secondaryText = secondaryText,
-                                onClick = { activeActionType = MovementType.RETURN },
-                                modifier = Modifier.weight(1f)
-                            )
+                                // REMOVE STOCK
+                                PartStockActionTile(
+                                    title = "Remove Stock",
+                                    subtitle = "",
+                                    icon = Icons.Outlined.RemoveCircleOutline,
+                                    iconBg = if (isDark) Color(0xFF38141B) else Color(0xFFFEE2E2),
+                                    iconTint = if (isDark) Color(0xFFFB7185) else Color(0xFFDC2626),
+                                    cardBg = cardBg,
+                                    cardBorder = cardBorder,
+                                    primaryText = primaryText,
+                                    secondaryText = secondaryText,
+                                    onClick = { activeActionType = MovementType.REMOVE },
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
 
-                            // ADJUST COUNT
-                            PartStockActionTile(
-                                title = "Adjust Count",
-                                subtitle = "",
-                                icon = Icons.Outlined.Tune,
-                                iconBg = if (isDark) Color(0xFF451A03) else Color(0xFFFEF3C7),
-                                iconTint = if (isDark) Color(0xFFFBBF24) else Color(0xFFD97706),
-                                cardBg = cardBg,
-                                cardBorder = cardBorder,
-                                primaryText = primaryText,
-                                secondaryText = secondaryText,
-                                onClick = { activeActionType = MovementType.ADJUST },
-                                modifier = Modifier.weight(1f)
-                            )
+                            // Row 2: Return & Adjust Count (Adjust Count only for Owner/Admin)
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.spacedBy(10.dp)
+                            ) {
+                                // RETURN
+                                PartStockActionTile(
+                                    title = "Return",
+                                    subtitle = "",
+                                    icon = Icons.Outlined.RotateLeft,
+                                    iconBg = if (isDark) Color(0xFF2E2A48) else Color(0xFFEFEBFA),
+                                    iconTint = if (isDark) Color(0xFFC4B5FD) else Color(0xFF4F46E5),
+                                    cardBg = cardBg,
+                                    cardBorder = cardBorder,
+                                    primaryText = primaryText,
+                                    secondaryText = secondaryText,
+                                    onClick = { activeActionType = MovementType.RETURN },
+                                    modifier = Modifier.weight(1f)
+                                )
+
+                                if (currentUserRole.canEditParts) {
+                                    // ADJUST COUNT
+                                    PartStockActionTile(
+                                        title = "Adjust Count",
+                                        subtitle = "",
+                                        icon = Icons.Outlined.Tune,
+                                        iconBg = if (isDark) Color(0xFF451A03) else Color(0xFFFEF3C7),
+                                        iconTint = if (isDark) Color(0xFFFBBF24) else Color(0xFFD97706),
+                                        cardBg = cardBg,
+                                        cardBorder = cardBorder,
+                                        primaryText = primaryText,
+                                        secondaryText = secondaryText,
+                                        onClick = { activeActionType = MovementType.ADJUST },
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                } else {
+                                    Spacer(modifier = Modifier.weight(1f))
+                                }
+                            }
                         }
                     }
                 }

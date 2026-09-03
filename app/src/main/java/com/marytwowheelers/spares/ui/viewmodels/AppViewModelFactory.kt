@@ -7,19 +7,20 @@ import com.marytwowheelers.spares.data.repository.InventoryRepository
 
 class AppViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
     private val repository = InventoryRepository(context.applicationContext)
+    private val accessRepository = com.marytwowheelers.spares.data.repository.AccessRepository(context.applicationContext)
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(InventoryViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return InventoryViewModel(repository) as T
+            return InventoryViewModel(repository, accessRepository) as T
         }
         if (modelClass.isAssignableFrom(DashboardViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return DashboardViewModel(repository) as T
+            return DashboardViewModel(repository, accessRepository) as T
         }
         if (modelClass.isAssignableFrom(PartDetailsViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return PartDetailsViewModel(repository) as T
+            return PartDetailsViewModel(repository, accessRepository) as T
         }
         if (modelClass.isAssignableFrom(HistoryViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
@@ -27,8 +28,7 @@ class AppViewModelFactory(private val context: Context) : ViewModelProvider.Fact
         }
         if (modelClass.isAssignableFrom(SettingsViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            val accessRepo = com.marytwowheelers.spares.data.repository.AccessRepository(context.applicationContext)
-            return SettingsViewModel(repository, accessRepo) as T
+            return SettingsViewModel(repository, accessRepository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }

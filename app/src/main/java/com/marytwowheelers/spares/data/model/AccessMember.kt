@@ -4,13 +4,18 @@ enum class UserRole(val displayName: String) {
     ADMIN("Admin"),
     OWNER("Owner"),
     STAFF("Staff"),
-    RELATIVE("Relative"),
-    FRIEND("Friend");
+    VIEWER("Viewer");
 
     val canManageUsers: Boolean get() = this == ADMIN || this == OWNER
     val canClearHistory: Boolean get() = this == ADMIN || this == OWNER
     val canResetLocalDb: Boolean get() = this == ADMIN || this == OWNER
     val canDeleteCloudDb: Boolean get() = this == ADMIN
+
+    val canAddParts: Boolean get() = this == ADMIN || this == OWNER
+    val canEditParts: Boolean get() = this == ADMIN || this == OWNER
+    val canDeleteParts: Boolean get() = this == ADMIN || this == OWNER
+    val canAdjustStock: Boolean get() = this == ADMIN || this == OWNER || this == STAFF
+    val isReadOnly: Boolean get() = this == VIEWER
 
     companion object {
         fun fromString(value: String?): UserRole {
@@ -18,8 +23,7 @@ enum class UserRole(val displayName: String) {
                 "ADMIN" -> ADMIN
                 "OWNER" -> OWNER
                 "STAFF" -> STAFF
-                "RELATIVE" -> RELATIVE
-                "FRIEND" -> FRIEND
+                "VIEWER", "RELATIVE", "FRIEND" -> VIEWER
                 else -> STAFF
             }
         }

@@ -78,6 +78,7 @@ fun InventoryScreen(
     val searchQuery       by viewModel.searchQuery.collectAsState()
     val partsList         by viewModel.partsList.collectAsState()
     val syncStatus        by viewModel.syncStatus.collectAsState()
+    val currentUserRole   by viewModel.currentUserRole.collectAsState()
     var selectedFilter    by remember { mutableStateOf(InventoryFilter.ALL) }
     var selectedSort      by remember { mutableStateOf(InventorySort.SERIAL_ASC) }
     var showSortSheet     by remember { mutableStateOf(false) }
@@ -354,7 +355,7 @@ fun InventoryScreen(
             }
         },
         floatingActionButton = {
-            if (!isSelectionMode) {
+            if (!isSelectionMode && currentUserRole.canAddParts) {
                 FloatingActionButton(
                     onClick = { showAddPartDialog = true },
                     containerColor = if (isDark) Color(0xFF5046E5) else Color(0xFF5046E5),
@@ -524,37 +525,39 @@ fun InventoryScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    // Select Button
-                    Surface(
-                        shape = RoundedCornerShape(8.dp),
-                        color = if (isSelectionMode) (if (isDark) Color(0xFF2E2A48) else Color(0xFFEEF2FF)) else pillBg,
-                        border = BorderStroke(1.dp, if (isSelectionMode) (if (isDark) Color(0xFF6366F1) else Color(0xFFC7D2FE)) else cardBorder),
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(8.dp))
-                            .clickable {
-                                isSelectionMode = !isSelectionMode
-                                if (!isSelectionMode) selectedPartIds.clear()
-                            }
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(5.dp)
+                    // Select Button (Only Owner / Admin can bulk select/delete)
+                    if (currentUserRole.canDeleteParts) {
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = if (isSelectionMode) (if (isDark) Color(0xFF2E2A48) else Color(0xFFEEF2FF)) else pillBg,
+                            border = BorderStroke(1.dp, if (isSelectionMode) (if (isDark) Color(0xFF6366F1) else Color(0xFFC7D2FE)) else cardBorder),
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .clickable {
+                                    isSelectionMode = !isSelectionMode
+                                    if (!isSelectionMode) selectedPartIds.clear()
+                                }
                         ) {
-                            Icon(
-                                imageVector = if (isSelectionMode) Icons.Default.Close else Icons.Outlined.Checklist,
-                                contentDescription = "Select",
-                                tint = if (isSelectionMode) (if (isDark) Color(0xFFC4B5FD) else Color(0xFF5046E5)) else secondaryText,
-                                modifier = Modifier.size(15.dp)
-                            )
-                            Text(
-                                text = if (isSelectionMode) "Done" else "Select",
-                                style = MaterialTheme.typography.bodySmall.copy(
-                                    fontSize = 12.5.sp,
-                                    color = if (isSelectionMode) (if (isDark) Color(0xFFC4B5FD) else Color(0xFF5046E5)) else primaryText,
-                                    fontWeight = FontWeight.SemiBold
+                            Row(
+                                modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(5.dp)
+                            ) {
+                                Icon(
+                                    imageVector = if (isSelectionMode) Icons.Default.Close else Icons.Outlined.Checklist,
+                                    contentDescription = "Select",
+                                    tint = if (isSelectionMode) (if (isDark) Color(0xFFC4B5FD) else Color(0xFF5046E5)) else secondaryText,
+                                    modifier = Modifier.size(15.dp)
                                 )
-                            )
+                                Text(
+                                    text = if (isSelectionMode) "Done" else "Select",
+                                    style = MaterialTheme.typography.bodySmall.copy(
+                                        fontSize = 12.5.sp,
+                                        color = if (isSelectionMode) (if (isDark) Color(0xFFC4B5FD) else Color(0xFF5046E5)) else primaryText,
+                                        fontWeight = FontWeight.SemiBold
+                                    )
+                                )
+                            }
                         }
                     }
 
@@ -633,9 +636,11 @@ fun InventoryScreen(
                                 }
                             },
                             onLongClick = {
-                                isSelectionMode = true
-                                if (!isPartSelected) {
-                                    selectedPartIds.add(part.part.id)
+                                if (currentUserRole.canDeleteParts) {
+                                    isSelectionMode = true
+                                    if (!isPartSelected) {
+                                        selectedPartIds.add(part.part.id)
+                                    }
                                 }
                             },
                             onClick = { onNavigateToPartDetails(part.part.id) }

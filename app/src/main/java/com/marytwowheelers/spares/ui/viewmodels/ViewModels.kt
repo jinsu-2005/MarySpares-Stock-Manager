@@ -24,10 +24,19 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
-class InventoryViewModel(private val repository: InventoryRepository) : ViewModel() {
+class InventoryViewModel(
+    private val repository: InventoryRepository,
+    private val accessRepository: AccessRepository
+) : ViewModel() {
     init {
         repository.triggerSync()
     }
+
+    val currentUserRole: StateFlow<UserRole> = accessRepository.currentUserRole.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = UserRole.STAFF
+    )
 
     val syncStatus = repository.syncStatus.stateIn(
         scope = viewModelScope,
@@ -82,10 +91,19 @@ class InventoryViewModel(private val repository: InventoryRepository) : ViewMode
     }
 }
 
-class DashboardViewModel(private val repository: InventoryRepository) : ViewModel() {
+class DashboardViewModel(
+    private val repository: InventoryRepository,
+    private val accessRepository: AccessRepository
+) : ViewModel() {
     init {
         repository.triggerSync()
     }
+
+    val currentUserRole: StateFlow<UserRole> = accessRepository.currentUserRole.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = UserRole.STAFF
+    )
 
     val partsList = repository.getAllPartsWithStock().stateIn(
         scope = viewModelScope,
@@ -123,8 +141,17 @@ class DashboardViewModel(private val repository: InventoryRepository) : ViewMode
     }
 }
 
-class PartDetailsViewModel(private val repository: InventoryRepository) : ViewModel() {
+class PartDetailsViewModel(
+    private val repository: InventoryRepository,
+    private val accessRepository: AccessRepository
+) : ViewModel() {
     private val _partId = MutableStateFlow<String?>(null)
+
+    val currentUserRole: StateFlow<UserRole> = accessRepository.currentUserRole.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = UserRole.STAFF
+    )
 
     val syncStatus = repository.syncStatus.stateIn(
         scope = viewModelScope,

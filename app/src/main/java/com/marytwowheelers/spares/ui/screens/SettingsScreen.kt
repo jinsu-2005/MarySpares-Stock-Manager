@@ -377,8 +377,7 @@ fun SettingsScreen(
                                         UserRole.ADMIN -> if (isDark) Color(0xFF4C1D95) else Color(0xFFEDE9FE)
                                         UserRole.OWNER -> if (isDark) Color(0xFF064E3B) else Color(0xFFDCFCE7)
                                         UserRole.STAFF -> if (isDark) Color(0xFF1E3A8A) else Color(0xFFDBEAFE)
-                                        UserRole.RELATIVE -> if (isDark) Color(0xFF134E4A) else Color(0xFFCCFBF1)
-                                        UserRole.FRIEND -> if (isDark) Color(0xFF78350F) else Color(0xFFFEF3C7)
+                                        UserRole.VIEWER -> if (isDark) Color(0xFF134E4A) else Color(0xFFCCFBF1)
                                     }
                                 ) {
                                     Text(
@@ -390,8 +389,7 @@ fun SettingsScreen(
                                                 UserRole.ADMIN -> if (isDark) Color(0xFFDDD6FE) else Color(0xFF6D28D9)
                                                 UserRole.OWNER -> if (isDark) Color(0xFF34D399) else Color(0xFF059669)
                                                 UserRole.STAFF -> if (isDark) Color(0xFF93C5FD) else Color(0xFF2563EB)
-                                                UserRole.RELATIVE -> if (isDark) Color(0xFF5EEAD4) else Color(0xFF0D9488)
-                                                UserRole.FRIEND -> if (isDark) Color(0xFFFDE68A) else Color(0xFFD97706)
+                                                UserRole.VIEWER -> if (isDark) Color(0xFF5EEAD4) else Color(0xFF0D9488)
                                             }
                                         ),
                                         modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
@@ -479,9 +477,15 @@ fun SettingsScreen(
                                 }
                             }
 
-                            // Members List
+                            // Members List (Hide Admin from non-admin users)
+                            val visibleMembers = if (isUserAdmin) {
+                                accessMembers
+                            } else {
+                                accessMembers.filter { it.role != UserRole.ADMIN && it.email.lowercase() != "jinsu.j2005@gmail.com" }
+                            }
+
                             Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                                if (accessMembers.isEmpty()) {
+                                if (visibleMembers.isEmpty()) {
                                     Surface(
                                         shape = RoundedCornerShape(12.dp),
                                         color = pillBg,
@@ -495,7 +499,7 @@ fun SettingsScreen(
                                         )
                                     }
                                 } else {
-                                    accessMembers.forEach { member ->
+                                    visibleMembers.forEach { member ->
                                         val isRootAccount = member.email.lowercase() == "jinsu.j2005@gmail.com"
 
                                         Surface(
@@ -555,8 +559,7 @@ fun SettingsScreen(
                                                                     UserRole.ADMIN -> if (isDark) Color(0xFF4C1D95) else Color(0xFFEDE9FE)
                                                                     UserRole.OWNER -> if (isDark) Color(0xFF064E3B) else Color(0xFFDCFCE7)
                                                                     UserRole.STAFF -> if (isDark) Color(0xFF1E3A8A) else Color(0xFFDBEAFE)
-                                                                    UserRole.RELATIVE -> if (isDark) Color(0xFF134E4A) else Color(0xFFCCFBF1)
-                                                                    UserRole.FRIEND -> if (isDark) Color(0xFF78350F) else Color(0xFFFEF3C7)
+                                                                    UserRole.VIEWER -> if (isDark) Color(0xFF134E4A) else Color(0xFFCCFBF1)
                                                                 }
                                                             ) {
                                                                 Text(
@@ -568,8 +571,7 @@ fun SettingsScreen(
                                                                             UserRole.ADMIN -> if (isDark) Color(0xFFDDD6FE) else Color(0xFF6D28D9)
                                                                             UserRole.OWNER -> if (isDark) Color(0xFF34D399) else Color(0xFF059669)
                                                                             UserRole.STAFF -> if (isDark) Color(0xFF93C5FD) else Color(0xFF2563EB)
-                                                                            UserRole.RELATIVE -> if (isDark) Color(0xFF5EEAD4) else Color(0xFF0D9488)
-                                                                            UserRole.FRIEND -> if (isDark) Color(0xFFFDE68A) else Color(0xFFD97706)
+                                                                            UserRole.VIEWER -> if (isDark) Color(0xFF5EEAD4) else Color(0xFF0D9488)
                                                                         }
                                                                     ),
                                                                     modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
@@ -1658,7 +1660,7 @@ fun SettingsScreen(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
-                        listOf(UserRole.OWNER, UserRole.STAFF, UserRole.RELATIVE, UserRole.FRIEND).forEach { roleOption ->
+                        listOf(UserRole.OWNER, UserRole.STAFF, UserRole.VIEWER).forEach { roleOption ->
                             val isSelected = selectedRole == roleOption
                             Surface(
                                 shape = RoundedCornerShape(8.dp),

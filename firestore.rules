@@ -37,6 +37,10 @@ service cloud.firestore {
       return isAuth() && (isRootAdmin() || getUserRole() == 'ADMIN' || getUserRole() == 'OWNER');
     }
 
+    function isCanAdjustStock() {
+      return isAuth() && (isOwnerOrAdmin() || getUserRole() == 'STAFF');
+    }
+
     // 1. Invitations & Whitelist
     match /invitations/{email} {
       allow read: if isAuth();
@@ -56,13 +60,15 @@ service cloud.firestore {
 
     // 3. Parts Inventory
     match /parts/{partId} {
-      allow read, write: if isAuth();
+      allow read: if isAuth();
+      allow create, update: if isOwnerOrAdmin();
       allow delete: if isOwnerOrAdmin();
     }
 
     // 4. Stock Movement History
     match /movements/{movementId} {
-      allow read, write: if isAuth();
+      allow read: if isAuth();
+      allow create, update: if isCanAdjustStock();
       allow delete: if isOwnerOrAdmin();
     }
   }

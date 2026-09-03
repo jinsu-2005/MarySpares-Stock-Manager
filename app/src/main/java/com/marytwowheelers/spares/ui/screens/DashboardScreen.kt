@@ -76,6 +76,7 @@ fun DashboardScreen(
 
     val partsList by viewModel.partsList.collectAsState()
     val syncStatus by viewModel.syncStatus.collectAsState()
+    val currentUserRole by viewModel.currentUserRole.collectAsState()
 
     var showAddPartDialog by remember { mutableStateOf(false) }
     var showStockAlertDialog by remember { mutableStateOf(false) }
@@ -474,20 +475,36 @@ fun DashboardScreen(
                             modifier = Modifier.weight(1f)
                         )
 
-                        // ADD PART BUTTON
-                        ActionCard(
-                            icon = Icons.Default.Add,
-                            iconBg = if (isDark) Color(0xFF0F3B2E) else Color(0xFFE6F9F0),
-                            iconTint = if (isDark) Color(0xFF34D399) else Color(0xFF059669),
-                            title = "Add Part",
-                            subtitle = "",
-                            cardBg = cardBg,
-                            cardBorder = cardBorder,
-                            primaryText = primaryText,
-                            secondaryText = secondaryText,
-                            onClick = { showAddPartDialog = true },
-                            modifier = Modifier.weight(1f)
-                        )
+                        // ADD PART BUTTON (or Search Parts for Staff / Viewers)
+                        if (currentUserRole.canAddParts) {
+                            ActionCard(
+                                icon = Icons.Default.Add,
+                                iconBg = if (isDark) Color(0xFF0F3B2E) else Color(0xFFE6F9F0),
+                                iconTint = if (isDark) Color(0xFF34D399) else Color(0xFF059669),
+                                title = "Add Part",
+                                subtitle = "",
+                                cardBg = cardBg,
+                                cardBorder = cardBorder,
+                                primaryText = primaryText,
+                                secondaryText = secondaryText,
+                                onClick = { showAddPartDialog = true },
+                                modifier = Modifier.weight(1f)
+                            )
+                        } else {
+                            ActionCard(
+                                icon = Icons.Default.Search,
+                                iconBg = if (isDark) Color(0xFF0F3B2E) else Color(0xFFE6F9F0),
+                                iconTint = if (isDark) Color(0xFF34D399) else Color(0xFF059669),
+                                title = "Search Parts",
+                                subtitle = "",
+                                cardBg = cardBg,
+                                cardBorder = cardBorder,
+                                primaryText = primaryText,
+                                secondaryText = secondaryText,
+                                onClick = onNavigateToInventorySearch,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
                     }
 
                     // Row 2: Add Stock & Remove Stock
@@ -497,31 +514,47 @@ fun DashboardScreen(
                     ) {
                         // ADD STOCK
                         ActionCard(
-                            icon = Icons.Default.Add,
+                            icon = if (currentUserRole.isReadOnly) Icons.Outlined.Lock else Icons.Default.Add,
                             iconBg = if (isDark) Color(0xFF1E284A) else Color(0xFFEFF4FF),
                             iconTint = if (isDark) Color(0xFF60A5FA) else Color(0xFF2563EB),
                             title = "Add Stock",
-                            subtitle = "",
+                            subtitle = if (currentUserRole.isReadOnly) "Locked" else "",
                             cardBg = cardBg,
                             cardBorder = cardBorder,
                             primaryText = primaryText,
                             secondaryText = secondaryText,
-                            onClick = { stockActionTarget = MovementType.ADD },
+                            onClick = {
+                                if (currentUserRole.isReadOnly) {
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar("Read-Only Access: Viewers cannot modify stock.")
+                                    }
+                                } else {
+                                    stockActionTarget = MovementType.ADD
+                                }
+                            },
                             modifier = Modifier.weight(1f)
                         )
 
                         // REMOVE STOCK
                         ActionCard(
-                            icon = Icons.Default.Remove,
+                            icon = if (currentUserRole.isReadOnly) Icons.Outlined.Lock else Icons.Default.Remove,
                             iconBg = if (isDark) Color(0xFF38141B) else Color(0xFFFFEEF0),
                             iconTint = if (isDark) Color(0xFFFB7185) else Color(0xFFF43F5E),
                             title = "Remove Stock",
-                            subtitle = "",
+                            subtitle = if (currentUserRole.isReadOnly) "Locked" else "",
                             cardBg = cardBg,
                             cardBorder = cardBorder,
                             primaryText = primaryText,
                             secondaryText = secondaryText,
-                            onClick = { stockActionTarget = MovementType.REMOVE },
+                            onClick = {
+                                if (currentUserRole.isReadOnly) {
+                                    scope.launch {
+                                        snackbarHostState.showSnackbar("Read-Only Access: Viewers cannot modify stock.")
+                                    }
+                                } else {
+                                    stockActionTarget = MovementType.REMOVE
+                                }
+                            },
                             modifier = Modifier.weight(1f)
                         )
                     }
