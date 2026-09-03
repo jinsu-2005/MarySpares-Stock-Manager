@@ -73,73 +73,123 @@ fun StockAlertDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
-            Row(
+            Column(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Row(
+                    modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(38.dp)
-                            .background(
-                                color = if (allAlerts.isNotEmpty()) {
-                                    if (isDark) Color(0xFF451A03) else Color(0xFFFEF3C7)
+                    Row(
+                        modifier = Modifier.weight(1f, fill = false),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(36.dp)
+                                .background(
+                                    color = if (allAlerts.isNotEmpty()) {
+                                        if (isDark) Color(0xFF451A03) else Color(0xFFFEF3C7)
+                                    } else {
+                                        if (isDark) Color(0xFF064E3B) else Color(0xFFDCFCE7)
+                                    },
+                                    shape = CircleShape
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = if (allAlerts.isNotEmpty()) Icons.Outlined.NotificationsActive else Icons.Outlined.CheckCircle,
+                                contentDescription = null,
+                                tint = if (allAlerts.isNotEmpty()) {
+                                    if (isDark) Color(0xFFFBBF24) else Color(0xFFD97706)
                                 } else {
-                                    if (isDark) Color(0xFF064E3B) else Color(0xFFDCFCE7)
+                                    if (isDark) Color(0xFF34D399) else Color(0xFF059669)
                                 },
-                                shape = CircleShape
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = if (allAlerts.isNotEmpty()) Icons.Outlined.NotificationsActive else Icons.Outlined.CheckCircle,
-                            contentDescription = null,
-                            tint = if (allAlerts.isNotEmpty()) {
-                                if (isDark) Color(0xFFFBBF24) else Color(0xFFD97706)
-                            } else {
-                                if (isDark) Color(0xFF34D399) else Color(0xFF059669)
-                            },
-                            modifier = Modifier.size(20.dp)
-                        )
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+
+                        Column {
+                            Text(
+                                text = "Stock Alerts",
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 17.sp,
+                                    color = primaryText
+                                )
+                            )
+                            Text(
+                                text = if (allAlerts.isNotEmpty()) {
+                                    if (unreviewedCount > 0) "$unreviewedCount unreviewed · ${allAlerts.size} total"
+                                    else "All ${allAlerts.size} alerts reviewed"
+                                } else "All parts are well stocked",
+                                style = MaterialTheme.typography.bodySmall.copy(
+                                    fontSize = 11.5.sp,
+                                    color = secondaryText
+                                )
+                            )
+                        }
                     }
 
-                    Column {
-                        Text(
-                            text = "Stock Alerts",
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                fontWeight = FontWeight.Bold,
-                                fontSize = 18.sp,
-                                color = primaryText
-                            )
-                        )
-                        Text(
-                            text = if (allAlerts.isNotEmpty()) {
-                                if (unreviewedCount > 0) "$unreviewedCount unreviewed of ${allAlerts.size} alerts"
-                                else "All ${allAlerts.size} alerts reviewed"
-                            } else "All parts are well stocked",
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                fontSize = 12.sp,
-                                color = secondaryText
-                            )
-                        )
-                    }
-                }
-
-                if (unreviewedCount > 0) {
-                    TextButton(
-                        onClick = {
-                            val keys = allAlerts.map { StockAlertManager.createAlertKey(it.part.id, it.currentStock) }.toSet()
-                            StockAlertManager.markAllAsReviewed(context, keys)
-                        },
-                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 4.dp)
-                    ) {
-                        Icon(Icons.Filled.DoneAll, contentDescription = null, modifier = Modifier.size(16.dp), tint = accentColor)
-                        Spacer(Modifier.width(4.dp))
-                        Text("Clear Badge", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = accentColor)
+                    if (unreviewedCount > 0) {
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = if (isDark) Color(0xFF2E2A48) else Color(0xFFEEF2FF),
+                            border = BorderStroke(1.dp, if (isDark) Color(0xFF6366F1).copy(alpha = 0.5f) else Color(0xFFC7D2FE)),
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(8.dp))
+                                .clickable {
+                                    val keys = allAlerts.map { StockAlertManager.createAlertKey(it.part.id, it.currentStock) }.toSet()
+                                    StockAlertManager.markAllAsReviewed(context, keys)
+                                }
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 5.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.DoneAll,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(14.dp),
+                                    tint = if (isDark) Color(0xFFC4B5FD) else Color(0xFF4F46E5)
+                                )
+                                Text(
+                                    text = "Clear Badge",
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (isDark) Color(0xFFC4B5FD) else Color(0xFF4F46E5)
+                                )
+                            }
+                        }
+                    } else if (allAlerts.isNotEmpty()) {
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = if (isDark) Color(0xFF142B23) else Color(0xFFECFDF5),
+                            border = BorderStroke(1.dp, if (isDark) Color(0xFF1E513F) else Color(0xFFA7F3D0))
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(horizontal = 7.dp, vertical = 4.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(3.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Outlined.CheckCircle,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(12.dp),
+                                    tint = Color(0xFF10B981)
+                                )
+                                Text(
+                                    text = "Reviewed",
+                                    fontSize = 10.5.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color(0xFF10B981)
+                                )
+                            }
+                        }
                     }
                 }
             }

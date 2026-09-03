@@ -35,8 +35,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import com.marytwowheelers.spares.data.local.StockAlertManager
 import com.marytwowheelers.spares.data.model.PartWithStock
 import com.marytwowheelers.spares.data.model.StockState
 import com.marytwowheelers.spares.data.model.stockState
@@ -79,8 +81,16 @@ fun InventoryScreen(
     var showAddPartDialog by remember { mutableStateOf(false) }
     var showStockAlertDialog by remember { mutableStateOf(false) }
 
+    val context = LocalContext.current
     LaunchedEffect(Unit) {
+        StockAlertManager.init(context)
         viewModel.triggerSync()
+    }
+
+    val acknowledgedKeys by StockAlertManager.acknowledgedKeys.collectAsState()
+    val unreviewedAlertCount = remember(partsList, acknowledgedKeys) {
+        partsList.filter { it.stockState != StockState.HEALTHY }
+            .count { !acknowledgedKeys.contains(StockAlertManager.createAlertKey(it.part.id, it.currentStock)) }
     }
 
     val searchFocusRequester = remember { FocusRequester() }
@@ -217,13 +227,12 @@ fun InventoryScreen(
                         ) {
                             BadgedBox(
                                 badge = {
-                                    val alertCount = lowStockCount + outOfStockCount
-                                    if (alertCount > 0) {
+                                    if (unreviewedAlertCount > 0) {
                                         Badge(
                                             containerColor = if (isDark) Color(0xFFEF4444) else Color(0xFFDC2626),
                                             contentColor = Color.White
                                         ) {
-                                            Text("$alertCount")
+                                            Text("$unreviewedAlertCount")
                                         }
                                     }
                                 }

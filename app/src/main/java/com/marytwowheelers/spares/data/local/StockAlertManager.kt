@@ -14,10 +14,9 @@ object StockAlertManager {
     private var isInitialized = false
 
     fun init(context: Context) {
-        if (isInitialized) return
-        val sp = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val sp = context.applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
         val saved = sp.getStringSet(KEY_ACKNOWLEDGED_KEYS, emptySet()) ?: emptySet()
-        _acknowledgedKeys.value = saved
+        _acknowledgedKeys.value = HashSet(saved)
         isInitialized = true
     }
 
@@ -28,29 +27,24 @@ object StockAlertManager {
     fun createAlertKey(partId: String, currentStock: Int): String = "${partId}_$currentStock"
 
     fun markAllAsReviewed(context: Context, alertKeys: Set<String>) {
-        init(context)
-        val updated = _acknowledgedKeys.value + alertKeys
-        _acknowledgedKeys.value = updated
-        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .edit()
-            .putStringSet(KEY_ACKNOWLEDGED_KEYS, updated)
-            .apply()
+        val sp = context.applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val current = sp.getStringSet(KEY_ACKNOWLEDGED_KEYS, emptySet()) ?: emptySet()
+        val updated = HashSet(current).apply { addAll(alertKeys) }
+        _acknowledgedKeys.value = HashSet(updated)
+        sp.edit().putStringSet(KEY_ACKNOWLEDGED_KEYS, HashSet(updated)).apply()
     }
 
     fun markPartAsReviewed(context: Context, alertKey: String) {
-        init(context)
-        val updated = _acknowledgedKeys.value + alertKey
-        _acknowledgedKeys.value = updated
-        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            .edit()
-            .putStringSet(KEY_ACKNOWLEDGED_KEYS, updated)
-            .apply()
+        val sp = context.applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val current = sp.getStringSet(KEY_ACKNOWLEDGED_KEYS, emptySet()) ?: emptySet()
+        val updated = HashSet(current).apply { add(alertKey) }
+        _acknowledgedKeys.value = HashSet(updated)
+        sp.edit().putStringSet(KEY_ACKNOWLEDGED_KEYS, HashSet(updated)).apply()
     }
 
     fun clearAllReviewed(context: Context) {
-        init(context)
         _acknowledgedKeys.value = emptySet()
-        context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        context.applicationContext.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
             .edit()
             .remove(KEY_ACKNOWLEDGED_KEYS)
             .apply()
