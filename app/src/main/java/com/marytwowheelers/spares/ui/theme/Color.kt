@@ -41,6 +41,11 @@ val DarkOutlineVariant = Color(0xFF323748)
 val DarkOnSurface      = Color(0xFFF3F4F6)
 val DarkOnSurfaceVar   = Color(0xFF9CA3AF)
 
+// Floating Modals & Action Popups
+val DarkPopupSurface   = Color(0xFF2C3142) // Elevated lighter slate surface for modal dialogs & action popups
+val DarkPopupBorder    = Color(0xFF424A63) // Crisp border for floating action popups
+val DarkPopupPill      = Color(0xFF373E54) // Inner elevated containers inside popups
+
 // =============================================
 // SEMANTIC STOCK STATUS (same in both themes)
 // =============================================

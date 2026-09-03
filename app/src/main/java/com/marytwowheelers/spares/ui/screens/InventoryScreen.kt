@@ -658,10 +658,10 @@ fun InventoryScreen(
         EnhancedSortDialog(
             currentSort = selectedSort,
             isDark = isDark,
-            primaryText = primaryText,
-            secondaryText = secondaryText,
-            cardBg = cardBg,
-            cardBorder = cardBorder,
+            primaryText = if (isDark) Color(0xFFF9FAFB) else primaryText,
+            secondaryText = if (isDark) Color(0xFFA5B4CB) else secondaryText,
+            cardBg = if (isDark) Color(0xFF2C3142) else Color.White,
+            cardBorder = if (isDark) Color(0xFF424A63) else Color(0xFFEEF0FA),
             activeColor = if (isDark) Color(0xFFC4B5FD) else Color(0xFF5046E5),
             onSelectSort = { newSort ->
                 selectedSort = newSort
@@ -712,6 +712,7 @@ fun InventoryScreen(
     if (showBulkDeleteConfirmDialog) {
         AlertDialog(
             onDismissRequest = { if (!isDeletingBulk) showBulkDeleteConfirmDialog = false },
+            modifier = Modifier.border(BorderStroke(1.dp, if (isDark) Color(0xFF424A63) else Color(0xFFEEF0FA)), RoundedCornerShape(22.dp)),
             title = {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -778,7 +779,7 @@ fun InventoryScreen(
                     Text("Cancel", color = secondaryText)
                 }
             },
-            containerColor = cardBg,
+            containerColor = if (isDark) Color(0xFF2C3142) else Color.White,
             shape = RoundedCornerShape(22.dp)
         )
     }
@@ -1127,6 +1128,7 @@ private fun EnhancedSortDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
+        modifier = Modifier.border(BorderStroke(1.dp, cardBorder), RoundedCornerShape(20.dp)),
         title = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,

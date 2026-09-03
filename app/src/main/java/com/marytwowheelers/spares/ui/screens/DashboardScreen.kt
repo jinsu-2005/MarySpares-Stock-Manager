@@ -2,6 +2,7 @@ package com.marytwowheelers.spares.ui.screens
 
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -725,15 +726,18 @@ fun DashboardScreen(
     // 2. Select Part Modal for Add Stock or Remove Stock
     if (stockActionTarget != null && selectedPartForStock == null) {
         val actionType = stockActionTarget!!
+        val popupBg = if (isDark) Color(0xFF2C3142) else Color.White
+        val popupBorder = if (isDark) Color(0xFF424A63) else Color(0xFFEEF0FA)
+        val popupPill = if (isDark) Color(0xFF373E54) else Color(0xFFF1F3F9)
         SelectPartDialog(
             actionType = actionType,
             partsList = partsList,
             isDark = isDark,
-            primaryText = primaryText,
-            secondaryText = secondaryText,
-            cardBg = cardBg,
-            cardBorder = cardBorder,
-            pillBg = pillBg,
+            primaryText = if (isDark) Color(0xFFF9FAFB) else primaryText,
+            secondaryText = if (isDark) Color(0xFFA5B4CB) else secondaryText,
+            cardBg = popupBg,
+            cardBorder = popupBorder,
+            pillBg = popupPill,
             onDismiss = { stockActionTarget = null },
             onPartSelected = { part ->
                 selectedPartForStock = part
@@ -972,6 +976,7 @@ private fun SelectPartDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
+        modifier = Modifier.border(BorderStroke(1.dp, cardBorder), RoundedCornerShape(22.dp)),
         title = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,

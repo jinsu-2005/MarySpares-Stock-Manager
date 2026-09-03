@@ -2,6 +2,7 @@ package com.marytwowheelers.spares.ui.screens
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -736,6 +737,7 @@ fun PartDetailsScreen(
     if (showDeleteConfirm && partWithStock != null && currentUserRole.canDeleteParts) {
         AlertDialog(
             onDismissRequest = { showDeleteConfirm = false },
+            modifier = Modifier.border(BorderStroke(1.dp, if (isDark) Color(0xFF424A63) else Color(0xFFEEF0FA)), RoundedCornerShape(20.dp)),
             title = {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
@@ -1027,8 +1029,9 @@ private fun EditPartDialog(
 
     val cs = MaterialTheme.colorScheme
     val isDark = cs.background.red < 0.5f
-    val cardBg = if (isDark) Color(0xFF222530) else Color.White
-    val secondaryText = if (isDark) Color(0xFF9CA3AF) else Color(0xFF6B7280)
+    val cardBg = if (isDark) Color(0xFF2C3142) else Color.White
+    val cardBorder = if (isDark) Color(0xFF424A63) else Color(0xFFEEF0FA)
+    val secondaryText = if (isDark) Color(0xFFA5B4CB) else Color(0xFF6B7280)
 
     val isSpValid = sellingPrice.isBlank() || (sellingPrice.toDoubleOrNull() != null && (sellingPrice.toDoubleOrNull() ?: 0.0) >= 0)
     val isMrpValid = mrp.isBlank() || (mrp.toDoubleOrNull() != null && (mrp.toDoubleOrNull() ?: 0.0) >= 0)
@@ -1036,6 +1039,7 @@ private fun EditPartDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
+        modifier = Modifier.border(BorderStroke(1.dp, cardBorder), RoundedCornerShape(20.dp)),
         title = {
             Text(
                 text = "Edit Part #${part.serialNumber}",

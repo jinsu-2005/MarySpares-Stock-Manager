@@ -1,6 +1,7 @@
 package com.marytwowheelers.spares.ui.components
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -37,11 +38,11 @@ fun StockActionDialog(
     val cs = MaterialTheme.colorScheme
     val isDark = cs.background.red < 0.5f
 
-    val cardBg = if (isDark) Color(0xFF222530) else Color.White
-    val cardBorder = if (isDark) Color(0xFF323748) else Color(0xFFEEF0FA)
-    val primaryText = if (isDark) Color(0xFFF3F4F6) else Color(0xFF1E1B4B)
-    val secondaryText = if (isDark) Color(0xFF9CA3AF) else Color(0xFF6B7280)
-    val pillBg = if (isDark) Color(0xFF2C3140) else Color(0xFFF1F3F9)
+    val cardBg = if (isDark) Color(0xFF2C3142) else Color.White
+    val cardBorder = if (isDark) Color(0xFF424A63) else Color(0xFFEEF0FA)
+    val primaryText = if (isDark) Color(0xFFF9FAFB) else Color(0xFF1E1B4B)
+    val secondaryText = if (isDark) Color(0xFFA5B4CB) else Color(0xFF6B7280)
+    val pillBg = if (isDark) Color(0xFF373E54) else Color(0xFFF1F3F9)
 
     val parsedQty = quantityInput.toIntOrNull() ?: 0
 
@@ -87,6 +88,7 @@ fun StockActionDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
+        modifier = Modifier.border(BorderStroke(1.dp, cardBorder), RoundedCornerShape(20.dp)),
         title = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,

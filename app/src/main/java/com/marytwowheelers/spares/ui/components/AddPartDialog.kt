@@ -1,6 +1,7 @@
 package com.marytwowheelers.spares.ui.components
 
 import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.border
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -38,14 +39,14 @@ fun AddPartDialog(
     val isDark = cs.background.red < 0.5f
 
     // ─── Theme Colors ─────────────────────────────
-    val cardBg = if (isDark) Color(0xFF222530) else Color.White
-    val cardBorder = if (isDark) Color(0xFF323748) else Color(0xFFEEF0FA)
-    val primaryText = if (isDark) Color(0xFFF3F4F6) else Color(0xFF1E1B4B)
-    val secondaryText = if (isDark) Color(0xFF9CA3AF) else Color(0xFF6B7280)
-    val pillBg = if (isDark) Color(0xFF2C3140) else Color(0xFFF1F3F9)
+    val cardBg = if (isDark) Color(0xFF2C3142) else Color.White
+    val cardBorder = if (isDark) Color(0xFF424A63) else Color(0xFFEEF0FA)
+    val primaryText = if (isDark) Color(0xFFF9FAFB) else Color(0xFF1E1B4B)
+    val secondaryText = if (isDark) Color(0xFFA5B4CB) else Color(0xFF6B7280)
+    val pillBg = if (isDark) Color(0xFF373E54) else Color(0xFFF1F3F9)
     val accentColor = if (isDark) Color(0xFFC4B5FD) else Color(0xFF5046E5)
     val emeraldTint = if (isDark) Color(0xFF34D399) else Color(0xFF059669)
-    val emeraldBg = if (isDark) Color(0xFF064E3B) else Color(0xFFDCFCE7)
+    val emeraldBg = if (isDark) Color(0xFF0D382B) else Color(0xFFDCFCE7)
 
     val isSpValid = sellingPrice.isBlank() || (sellingPrice.toDoubleOrNull() != null && (sellingPrice.toDoubleOrNull() ?: 0.0) >= 0)
     val isMrpValid = mrp.isBlank() || (mrp.toDoubleOrNull() != null && (mrp.toDoubleOrNull() ?: 0.0) >= 0)
@@ -55,6 +56,7 @@ fun AddPartDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
+        modifier = Modifier.border(BorderStroke(1.dp, cardBorder), RoundedCornerShape(20.dp)),
         title = {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
