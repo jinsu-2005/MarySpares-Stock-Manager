@@ -1,4 +1,4 @@
-# 🏍️ Mary Spares — Store Stock Manager
+﻿# 🏍️ Mary Spares — Store Stock Manager
 
 > **Modern, offline-first inventory & spare parts management system built exclusively for Mary Two Wheelers Spares store.**
 
@@ -32,11 +32,26 @@ Download the latest production release directly from GitHub:
 | 📦 **Smart Inventory Tracking** | Auto-assigned continuous serials (`#1`, `#2`...), custom part numbers, shelf/rack locations, and Rupee pricing (Selling Price & MRP). |
 | ⚡ **Offline-First Architecture** | High-speed local Room SQLite caching. Full app functionality available offline with zero latency. |
 | 🔄 **Firebase Cloud Sync** | Seamless two-way background sync with Cloud Firestore. Queues offline actions and uploads automatically when online. |
-| 🔔 **Stock Alerts & Review Badge** | Instant alerts for low stock ($\le 5$ units) and out-of-stock ($0$ units) with filter tabs and quick one-tap restock actions. |
+| 🔔 **Stock Alerts & Review Badge** | Instant alerts for low stock (≤ 5 units) and out-of-stock (0 units) with filter tabs and quick one-tap restock actions. |
 | 📜 **Audit History & Logs** | Complete transaction logging for all inward additions, stock adjustments, and sales with customizable retention pruning. |
-| 👥 **Role-Based Access Control** | Secure Google & Email authentication supporting 5 user roles (*Admin*, *Owner*, *Staff*, *Relative*, *Friend*) with invite whitelisting. |
+| 👥 **Role-Based Access Control** | Secure Google & Email authentication with 4 clearly defined user roles and strict permission enforcement per role. |
 | 💾 **SAF Backups & CSV Export** | Export store inventory directly to CSV or create complete 4-collection database `.zip` backups to any user-chosen folder (Downloads, Drive, SD card). |
-| 🎨 **Adaptive Modern UI** | Polished Glassmorphic Floating Dock, custom rounded snackbars, and a high-contrast Dark & Light mode. |
+| 🎨 **Adaptive Modern UI** | Polished Glassmorphic Floating Dock, elevated dark mode palette, custom rounded snackbars, and a high-contrast Dark & Light mode. |
+
+---
+
+## 👥 Role-Based Access Control
+
+The app enforces **4 distinct user roles** with strict server-side Firestore security rules and client-side UI locks:
+
+| Role | Who | Permissions |
+| :--- | :--- | :--- |
+| 🔴 **Admin** | Developer / System Admin | Full access — manage users, reset cloud DB, all inventory operations. Hidden from all other users. |
+| 🟣 **Owner** | Store Owner (Mary) | Add/edit/delete parts, adjust stock, manage team members (Staff & Viewer), clear history, reset local DB. |
+| 🟡 **Staff** | Shop Counter Staff | Add and remove stock only. Cannot add new parts, edit part details, or access settings. |
+| 🔵 **Viewer** | Relatives / Friends (read-only guests) | **Strict read-only.** Can view inventory and history only. All action buttons and edit controls are locked with a "No Access" indicator. |
+
+> **Note**: The legacy role strings `Relative` and `Friend` are automatically resolved to `Viewer` for backwards compatibility with older user records.
 
 ---
 
@@ -84,6 +99,8 @@ Download the latest production release directly from GitHub:
 
 4. **Locate the Output APK**:
    - Output directory: `app/build/outputs/apk/debug/app-debug.apk`
+
+> **Note**: The `versionCode` is automatically derived from the total git commit count at build time — it increments with every new commit automatically.
 
 ---
 
