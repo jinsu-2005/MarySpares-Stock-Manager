@@ -204,9 +204,15 @@ class AccessRepository(private val context: Context) {
 
     suspend fun removeMemberInvitation(emailOrId: String): Result<Unit> {
         val cleanEmail = emailOrId.lowercase().trim()
+        val currentEmail = auth.currentUser?.email?.lowercase()?.trim()
+
         // Prevent deleting root Admin
         if (cleanEmail == "jinsu.j2005@gmail.com") {
             return Result.failure(IllegalStateException("Root Admin account cannot be deleted."))
+        }
+        // Prevent users from deleting their own account
+        if (cleanEmail == currentEmail) {
+            return Result.failure(IllegalStateException("You cannot remove your own account."))
         }
         return try {
             firestore.collection("invitations").document(cleanEmail).delete().await()

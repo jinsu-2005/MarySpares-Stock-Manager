@@ -575,6 +575,23 @@ fun SettingsScreen(
                                                                     modifier = Modifier.padding(horizontal = 4.dp, vertical = 1.dp)
                                                                 )
                                                             }
+
+                                                            if (member.email.equals(userEmail, ignoreCase = true)) {
+                                                                Surface(
+                                                                    shape = RoundedCornerShape(4.dp),
+                                                                    color = if (isDark) Color(0xFF2E2A48) else Color(0xFFEDE9FE)
+                                                                ) {
+                                                                    Text(
+                                                                        text = "You",
+                                                                        style = MaterialTheme.typography.labelSmall.copy(
+                                                                            fontSize = 9.5.sp,
+                                                                            fontWeight = FontWeight.Bold,
+                                                                            color = if (isDark) Color(0xFFC4B5FD) else Color(0xFF4F46E5)
+                                                                        ),
+                                                                        modifier = Modifier.padding(horizontal = 5.dp, vertical = 1.dp)
+                                                                    )
+                                                                }
+                                                            }
                                                         }
 
                                                         Text(
@@ -589,7 +606,10 @@ fun SettingsScreen(
                                                     }
                                                 }
 
-                                                if (!isRootAccount) {
+                                                val isSelf = member.email.equals(userEmail, ignoreCase = true)
+                                                val canDeleteMember = isUserAdmin || (isUserOwner && member.role != UserRole.OWNER && member.role != UserRole.ADMIN)
+
+                                                if (!isRootAccount && !isSelf && canDeleteMember) {
                                                     IconButton(
                                                         onClick = { personToRevoke = member },
                                                         modifier = Modifier.size(28.dp)
