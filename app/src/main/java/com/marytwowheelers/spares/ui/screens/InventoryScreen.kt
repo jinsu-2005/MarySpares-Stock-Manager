@@ -79,6 +79,10 @@ fun InventoryScreen(
     var showAddPartDialog by remember { mutableStateOf(false) }
     var showStockAlertDialog by remember { mutableStateOf(false) }
 
+    LaunchedEffect(Unit) {
+        viewModel.triggerSync()
+    }
+
     val searchFocusRequester = remember { FocusRequester() }
     val keyboardController = LocalSoftwareKeyboardController.current
     val focusManager = LocalFocusManager.current

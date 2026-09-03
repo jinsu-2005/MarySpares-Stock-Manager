@@ -18,6 +18,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import java.util.UUID
@@ -27,6 +28,8 @@ class InventoryRepository(private val context: Context) {
     private val partDao = database.partDao()
     private val movementDao = database.movementDao()
     private val networkMonitor = NetworkMonitor(context)
+
+    private val repositoryScope = kotlinx.coroutines.CoroutineScope(Dispatchers.IO)
 
     /**
      * Real-time synchronization state combining network status, WorkManager active execution,
@@ -51,7 +54,14 @@ class InventoryRepository(private val context: Context) {
         }
     }
 
+    suspend fun directSync(): Boolean = withContext(Dispatchers.IO) {
+        com.marytwowheelers.spares.sync.SyncWorker.performSync(context)
+    }
+
     fun triggerSync() {
+        repositoryScope.launch {
+            directSync()
+        }
         SyncManager.enqueueSync(context)
     }
 
@@ -226,9 +236,12 @@ class InventoryRepository(private val context: Context) {
         }
     }
 
-    suspend fun resetLocalData() {
+    suspend fun resetLocalData(autoResync: Boolean = true) {
         withContext(Dispatchers.IO) {
             database.clearAllTables()
+            if (autoResync) {
+                com.marytwowheelers.spares.sync.SyncWorker.performSync(context)
+            }
         }
     }
 

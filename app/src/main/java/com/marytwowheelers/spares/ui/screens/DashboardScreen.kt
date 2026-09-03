@@ -67,6 +67,7 @@ fun DashboardScreen(
     val context = LocalContext.current
     LaunchedEffect(Unit) {
         StockAlertManager.init(context)
+        viewModel.triggerSync()
     }
 
     val acknowledgedKeys by StockAlertManager.acknowledgedKeys.collectAsState()

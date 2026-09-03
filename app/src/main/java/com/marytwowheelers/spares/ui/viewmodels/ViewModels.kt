@@ -280,7 +280,7 @@ class SettingsViewModel(
 
     fun resetLocalDatabase(onComplete: () -> Unit) {
         viewModelScope.launch {
-            repository.resetLocalData()
+            repository.resetLocalData(autoResync = true)
             onComplete()
         }
     }
@@ -402,7 +402,7 @@ class SettingsViewModel(
                 }
 
                 onProgress("Wiping local database cache & reset stock alerts...")
-                repository.resetLocalData()
+                repository.resetLocalData(autoResync = false)
                 StockAlertManager.clearAllReviewed(context)
 
                 onProgress("Re-bootstrapping initial Admin & Owner accounts...")
