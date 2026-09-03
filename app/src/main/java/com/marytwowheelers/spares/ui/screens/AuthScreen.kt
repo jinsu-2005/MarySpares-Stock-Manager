@@ -175,8 +175,11 @@ fun AuthScreen(onAuthSuccess: () -> Unit) {
                             // 2. Verify invitation whitelist
                             val invitation = accessRepo.checkInvitation(gEmail)
                             if (invitation == null) {
-                                // Unauthorized user -> sign out immediately
+                                // Unauthorized user -> sign out of Firebase and Google client immediately
                                 auth.signOut()
+                                try {
+                                    googleSignInClient.signOut().await()
+                                } catch (ignored: Exception) {}
                                 isGoogleLoading = false
                                 errorMsg = "Access Denied: '$gEmail' is not pre-authorized by an Admin or Owner. Please request an invitation from store management."
                                 return@launch
@@ -207,16 +210,26 @@ fun AuthScreen(onAuthSuccess: () -> Unit) {
                             ).show()
                             onAuthSuccess()
                         } catch (e: Exception) {
+                            try {
+                                auth.signOut()
+                                googleSignInClient.signOut().await()
+                            } catch (ignored: Exception) {}
                             isGoogleLoading = false
                             errorMsg = "Google sign-in error: ${e.localizedMessage ?: "Authentication failed"}"
                         }
                     }
                 } else {
                     isGoogleLoading = false
+                    try {
+                        googleSignInClient.signOut()
+                    } catch (ignored: Exception) {}
                     errorMsg = "Unable to retrieve Google account credentials. Please try again."
                 }
             } catch (e: Throwable) {
                 isGoogleLoading = false
+                try {
+                    googleSignInClient.signOut()
+                } catch (ignored: Exception) {}
                 if (e is ApiException) {
                     errorMsg = when (e.statusCode) {
                         12501 -> "Google sign-in was cancelled."
@@ -231,6 +244,9 @@ fun AuthScreen(onAuthSuccess: () -> Unit) {
             }
         } else {
             isGoogleLoading = false
+            try {
+                googleSignInClient.signOut()
+            } catch (ignored: Exception) {}
         }
     }
 
@@ -408,11 +424,13 @@ fun AuthScreen(onAuthSuccess: () -> Unit) {
                             if (!isLoading && !isGoogleLoading) {
                                 isGoogleLoading = true
                                 errorMsg = null
-                                try {
-                                    googleSignInLauncher.launch(googleSignInClient.signInIntent)
-                                } catch (e: Exception) {
-                                    isGoogleLoading = false
-                                    errorMsg = "Unable to start Google Sign-In: ${e.localizedMessage}"
+                                googleSignInClient.signOut().addOnCompleteListener {
+                                    try {
+                                        googleSignInLauncher.launch(googleSignInClient.signInIntent)
+                                    } catch (e: Exception) {
+                                        isGoogleLoading = false
+                                        errorMsg = "Unable to start Google Sign-In: ${e.localizedMessage}"
+                                    }
                                 }
                             }
                         },
