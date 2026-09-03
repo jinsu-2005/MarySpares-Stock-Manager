@@ -1,6 +1,6 @@
-# 🏍️ Mary Spares — Workshop Stock Manager
+# 🏍️ Mary Spares — Store Stock Manager
 
-> **Modern, offline-first inventory & spare parts management system built exclusively for Mary Two Wheelers workshop.**
+> **Modern, offline-first inventory & spare parts management system built exclusively for Mary Two Wheelers Spares store.**
 
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.0.21-purple.svg?style=flat&logo=kotlin)](https://kotlinlang.org)
 [![Jetpack Compose](https://img.shields.io/badge/UI-Jetpack%20Compose%20%26%20Material%203-4285F4.svg?style=flat&logo=android)](https://developer.android.com/jetpack/compose)
@@ -12,10 +12,10 @@
 
 ## 📥 Download & Install APK
 
-You can download the ready-to-install Android APK directly:
+Download the latest production release directly from GitHub:
 
-- 📦 **Direct Download**: [`apk/MarySpares-v1.0.4.apk`](apk/MarySpares-v1.0.4.apk)
-- 🏷️ **GitHub Releases**: [Releases Page](../../releases)
+- 🏷️ **Latest Release**: [**Download MarySpares-v1.0.4.apk (v1.0.4)**](https://github.com/jinsu-2005/MarySpares-Stock-Manager/releases/tag/v1.0.4)
+- 📦 **All Releases**: [GitHub Releases Page](https://github.com/jinsu-2005/MarySpares-Stock-Manager/releases)
 
 ### How to Install on Android:
 1. Download **`MarySpares-v1.0.4.apk`** to your phone.
@@ -35,7 +35,7 @@ You can download the ready-to-install Android APK directly:
 | 🔔 **Stock Alerts & Review Badge** | Instant alerts for low stock ($\le 5$ units) and out-of-stock ($0$ units) with filter tabs and quick one-tap restock actions. |
 | 📜 **Audit History & Logs** | Complete transaction logging for all inward additions, stock adjustments, and sales with customizable retention pruning. |
 | 👥 **Role-Based Access Control** | Secure Google & Email authentication supporting 5 user roles (*Admin*, *Owner*, *Staff*, *Relative*, *Friend*) with invite whitelisting. |
-| 💾 **SAF Backups & CSV Export** | Export inventory directly to CSV or create complete 4-collection database `.zip` backups to any user-chosen folder (Downloads, Drive, SD card). |
+| 💾 **SAF Backups & CSV Export** | Export store inventory directly to CSV or create complete 4-collection database `.zip` backups to any user-chosen folder (Downloads, Drive, SD card). |
 | 🎨 **Adaptive Modern UI** | Polished Glassmorphic Floating Dock, custom rounded snackbars, and a high-contrast Dark & Light mode. |
 
 ---
@@ -87,19 +87,8 @@ You can download the ready-to-install Android APK directly:
 
 ---
 
-## 🏷️ How to Create a GitHub Release (For Maintainers)
-
-1. Go to your GitHub Repository page.
-2. Click on **Releases** (on the right sidebar) $\rightarrow$ **Draft a new release**.
-3. Click **Choose a tag**, enter `v1.0.4`, and click **Create new tag**.
-4. Set the Release Title: `Mary Spares v1.0.4`.
-5. Drag and drop `apk/MarySpares-v1.0.4.apk` into the **Attach binaries** section.
-6. Click **Publish release**.
-
----
-
 ## 👤 Developer & Maintainer
 
 - **Developer & Maintainer**: **Jinsu J**
-- **Workshop**: **Mary Two Wheelers**
-- **Repository**: Private / Internal Workshop Management System
+- **Store**: **Mary Two Wheelers Spares**
+- **Repository**: Private / Store Inventory Management System
