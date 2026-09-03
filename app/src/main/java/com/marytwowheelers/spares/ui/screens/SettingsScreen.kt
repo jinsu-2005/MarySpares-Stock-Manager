@@ -1215,7 +1215,7 @@ fun SettingsScreen(
                                 color = pillBg
                             ) {
                                 Text(
-                                    text = "v1.0.4 • Build 2026",
+                                    text = "v$appVersionName • Build $appVersionCode",
                                     style = MaterialTheme.typography.labelSmall.copy(
                                         fontSize = 11.sp,
                                         fontWeight = FontWeight.Medium,

@@ -5,6 +5,10 @@ plugins {
     alias(libs.plugins.google.services)
 }
 
+val gitCommitCount = providers.exec {
+    commandLine("git", "rev-list", "--count", "HEAD")
+}.standardOutput.asText.map { it.trim().toIntOrNull() ?: 25 }.getOrElse(25)
+
 android {
     namespace = "com.marytwowheelers.spares"
     compileSdk {
@@ -15,8 +19,8 @@ android {
         applicationId = "com.marytwowheelers.spares"
         minSdk = 24
         targetSdk = 37
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = gitCommitCount
+        versionName = "1.0.4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
