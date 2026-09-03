@@ -145,12 +145,12 @@ fun InventoryScreen(
     val isDark = cs.background.red < 0.5f
 
     // ─── Theme Colors ─────────────────────────────
-    val pageBg = if (isDark) Color(0xFF111318) else Color(0xFFF7F8FC)
-    val cardBg = if (isDark) Color(0xFF1B1E26) else Color.White
-    val cardBorder = if (isDark) Color(0xFF2A2E3D) else Color(0xFFEEF0FA)
+    val pageBg = if (isDark) Color(0xFF181A22) else Color(0xFFF7F8FC)
+    val cardBg = if (isDark) Color(0xFF222530) else Color.White
+    val cardBorder = if (isDark) Color(0xFF323748) else Color(0xFFEEF0FA)
     val primaryText = if (isDark) Color(0xFFF3F4F6) else Color(0xFF1E1B4B)
     val secondaryText = if (isDark) Color(0xFF9CA3AF) else Color(0xFF6B7280)
-    val pillBg = if (isDark) Color(0xFF232734) else Color(0xFFF1F3F9)
+    val pillBg = if (isDark) Color(0xFF2C3140) else Color(0xFFF1F3F9)
 
     // Pill active colors (indigo/violet)
     val activeTabBg = if (isDark) Color(0xFF2E2A48) else Color(0xFFEEF2FF)
@@ -197,8 +197,8 @@ fun InventoryScreen(
             ) { inSelection ->
                 if (inSelection) {
                     Surface(
-                        color = if (isDark) Color(0xFF1B1E26) else Color(0xFFF3F0FF),
-                        border = BorderStroke(1.dp, if (isDark) Color(0xFF2A2E3D) else Color(0xFFDDD6FE)),
+                        color = if (isDark) Color(0xFF222530) else Color(0xFFF3F0FF),
+                        border = BorderStroke(1.dp, if (isDark) Color(0xFF323748) else Color(0xFFDDD6FE)),
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Row(

@@ -82,18 +82,18 @@ fun AuthScreen(onAuthSuccess: () -> Unit) {
     val primaryText = if (isDark) Color(0xFFF3F4F6) else Color(0xFF1E1B4B)
     val secondaryText = if (isDark) Color(0xFF9CA3AF) else Color(0xFF6B7280)
     val inputBg = if (isDark) Color(0xFF1E212A) else Color(0xFFF8FAFC)
-    val inputBorder = if (isDark) Color(0xFF33384A) else Color(0xFFE2E8F0)
-    val cardBg = if (isDark) Color(0xFF161820) else Color.White
-    val cardBorder = if (isDark) Color(0xFF282C3D) else Color(0xFFE5E7EB)
-    val pillBg = if (isDark) Color(0xFF212532) else Color(0xFFF1F5F9)
+    val inputBorder = if (isDark) Color(0xFF3B4257) else Color(0xFFE2E8F0)
+    val cardBg = if (isDark) Color(0xFF1F2330) else Color.White
+    val cardBorder = if (isDark) Color(0xFF323748) else Color(0xFFE5E7EB)
+    val pillBg = if (isDark) Color(0xFF282D3D) else Color(0xFFF1F5F9)
 
     val backgroundGradient = remember(isDark) {
         if (isDark) {
             Brush.verticalGradient(
                 colors = listOf(
-                    Color(0xFF0F0B18),
-                    Color(0xFF161026),
-                    Color(0xFF0B0D13)
+                    Color(0xFF171324),
+                    Color(0xFF1E1834),
+                    Color(0xFF141724)
                 )
             )
         } else {

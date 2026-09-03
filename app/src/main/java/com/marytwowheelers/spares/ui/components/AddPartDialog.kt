@@ -38,11 +38,11 @@ fun AddPartDialog(
     val isDark = cs.background.red < 0.5f
 
     // ─── Theme Colors ─────────────────────────────
-    val cardBg = if (isDark) Color(0xFF1B1E26) else Color.White
-    val cardBorder = if (isDark) Color(0xFF2A2E3D) else Color(0xFFEEF0FA)
+    val cardBg = if (isDark) Color(0xFF222530) else Color.White
+    val cardBorder = if (isDark) Color(0xFF323748) else Color(0xFFEEF0FA)
     val primaryText = if (isDark) Color(0xFFF3F4F6) else Color(0xFF1E1B4B)
     val secondaryText = if (isDark) Color(0xFF9CA3AF) else Color(0xFF6B7280)
-    val pillBg = if (isDark) Color(0xFF232734) else Color(0xFFF1F3F9)
+    val pillBg = if (isDark) Color(0xFF2C3140) else Color(0xFFF1F3F9)
     val accentColor = if (isDark) Color(0xFFC4B5FD) else Color(0xFF5046E5)
     val emeraldTint = if (isDark) Color(0xFF34D399) else Color(0xFF059669)
     val emeraldBg = if (isDark) Color(0xFF064E3B) else Color(0xFFDCFCE7)

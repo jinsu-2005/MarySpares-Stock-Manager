@@ -98,12 +98,12 @@ fun DashboardScreen(
     val isDark = cs.background.red < 0.5f
 
     // Rich Dark / Light Palette
-    val pageBg = if (isDark) Color(0xFF111318) else Color(0xFFF7F8FC)
-    val cardBg = if (isDark) Color(0xFF1B1E26) else Color.White
-    val cardBorder = if (isDark) Color(0xFF2A2E3D) else Color(0xFFEEF0FA)
+    val pageBg = if (isDark) Color(0xFF181A22) else Color(0xFFF7F8FC)
+    val cardBg = if (isDark) Color(0xFF222530) else Color.White
+    val cardBorder = if (isDark) Color(0xFF323748) else Color(0xFFEEF0FA)
     val primaryText = if (isDark) Color(0xFFF3F4F6) else Color(0xFF1E1B4B)
     val secondaryText = if (isDark) Color(0xFF9CA3AF) else Color(0xFF6B7280)
-    val pillBg = if (isDark) Color(0xFF232734) else Color(0xFFF1F3F9)
+    val pillBg = if (isDark) Color(0xFF2C3140) else Color(0xFFF1F3F9)
 
     Scaffold(
         containerColor = pageBg,
@@ -229,7 +229,7 @@ fun DashboardScreen(
                 val (bannerBg, bannerBorder, bannerIconBg, bannerIconTint, bannerTitle, bannerSubtitle, badgeText, badgeBg, badgeColor) = when (val s = syncStatus) {
                     is AppSyncStatus.Offline -> SyncBannerVisuals(
                         if (isDark) Color(0xFF171A21) else Color(0xFFF9FAFB),
-                        if (isDark) Color(0xFF2A2E3D) else Color(0xFFE5E7EB),
+                        if (isDark) Color(0xFF323748) else Color(0xFFE5E7EB),
                         if (isDark) Color(0xFF232734) else Color(0xFFF3F4F6),
                         if (isDark) Color(0xFFD1D5DB) else Color(0xFF6B7280),
                         "Offline Mode",
