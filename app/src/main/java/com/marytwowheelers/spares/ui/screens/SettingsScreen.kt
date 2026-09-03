@@ -1205,47 +1205,27 @@ fun SettingsScreen(
                             )
                         }
 
-                        // Version & Cloud Sync Badges
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                            verticalAlignment = Alignment.CenterVertically
+                        // Cloud Sync Badge
+                        Surface(
+                            shape = RoundedCornerShape(8.dp),
+                            color = if (isDark) Color(0xFF064E3B) else Color(0xFFDCFCE7)
                         ) {
-                            Surface(
-                                shape = RoundedCornerShape(8.dp),
-                                color = pillBg
+                            Row(
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
                             ) {
+                                Box(
+                                    modifier = Modifier.size(6.dp).background(if (isDark) Color(0xFF34D399) else Color(0xFF059669), CircleShape)
+                                )
                                 Text(
-                                    text = "v$appVersionName • Build $appVersionCode",
+                                    text = "Cloud Sync Active",
                                     style = MaterialTheme.typography.labelSmall.copy(
                                         fontSize = 11.sp,
-                                        fontWeight = FontWeight.Medium,
-                                        color = secondaryText
-                                    ),
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (isDark) Color(0xFF34D399) else Color(0xFF059669)
+                                    )
                                 )
-                            }
-
-                            Surface(
-                                shape = RoundedCornerShape(8.dp),
-                                color = if (isDark) Color(0xFF064E3B) else Color(0xFFDCFCE7)
-                            ) {
-                                Row(
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                                ) {
-                                    Box(
-                                        modifier = Modifier.size(6.dp).background(if (isDark) Color(0xFF34D399) else Color(0xFF059669), CircleShape)
-                                    )
-                                    Text(
-                                        text = "Cloud Sync Active",
-                                        style = MaterialTheme.typography.labelSmall.copy(
-                                            fontSize = 11.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            color = if (isDark) Color(0xFF34D399) else Color(0xFF059669)
-                                        )
-                                    )
-                                }
                             }
                         }
 
