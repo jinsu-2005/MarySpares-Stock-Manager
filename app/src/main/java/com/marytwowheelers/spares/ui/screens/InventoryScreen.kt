@@ -675,7 +675,9 @@ fun InventoryScreen(
     // ADD PART DIALOG
     // ─────────────────────────────────────────────
     if (showAddPartDialog && currentUserRole.canAddParts) {
+        val nextSerialNumber = (partsList.maxOfOrNull { it.part.serialNumber } ?: 0L) + 1L
         AddPartDialog(
+            nextSerialNumber = nextSerialNumber,
             onDismiss = { showAddPartDialog = false },
             onConfirm = { name, partNumber, shelf, sp, mrp, stock ->
                 viewModel.addPart(name, partNumber, shelf, sp, mrp, stock)
@@ -847,7 +849,7 @@ fun InventoryPartCard(
 ) {
     val stock = part.currentStock
     val isOut = stock <= 0
-    val isLow = stock in 1..5
+    val isLow = stock in 1..3
 
     // Pulsing animation for Low and Empty stock
     val infiniteTransition = rememberInfiniteTransition(label = "stockPulse")

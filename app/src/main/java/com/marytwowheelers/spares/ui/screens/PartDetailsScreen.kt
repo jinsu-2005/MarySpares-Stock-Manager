@@ -166,7 +166,7 @@ fun PartDetailsScreen(
             val p = partWithStock!!
             val stock = p.currentStock
             val isOut = stock <= 0
-            val isLow = stock in 1..5
+            val isLow = stock in 1..3
 
             // Status Colors & Badges
             val (statusText, statusBadgeBg, statusBadgeTint, statusIcon) = when {

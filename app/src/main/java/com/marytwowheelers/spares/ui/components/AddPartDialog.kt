@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.sp
 
 @Composable
 fun AddPartDialog(
+    nextSerialNumber: Long? = null,
     onDismiss: () -> Unit,
     onConfirm: (name: String, partNumber: String, shelfLocation: String, sellingPricePaise: Long, mrpPaise: Long, initialStock: Int) -> Unit
 ) {
@@ -110,7 +111,7 @@ fun AddPartDialog(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Row(
-                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 6.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(6.dp)
                     ) {
@@ -118,16 +119,37 @@ fun AddPartDialog(
                             imageVector = Icons.Outlined.AutoAwesome,
                             contentDescription = null,
                             tint = accentColor,
-                            modifier = Modifier.size(13.dp)
+                            modifier = Modifier.size(14.dp)
                         )
-                        Text(
-                            text = "Auto-assigns next serial (#1, #2...)",
-                            style = MaterialTheme.typography.labelSmall.copy(
-                                fontSize = 10.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = if (isDark) Color(0xFFDDD6FE) else Color(0xFF4338CA)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text(
+                                text = "Auto-assign serial",
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    fontSize = 10.5.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = if (isDark) Color(0xFFDDD6FE) else Color(0xFF4338CA)
+                                )
                             )
-                        )
+                            val serialText = if (nextSerialNumber != null && nextSerialNumber > 0) "#$nextSerialNumber" else "Auto"
+                            Surface(
+                                shape = RoundedCornerShape(6.dp),
+                                color = if (isDark) Color(0xFF4C3D7A) else Color(0xFFDDD6FE)
+                            ) {
+                                Text(
+                                    text = "Your next serial no is $serialText",
+                                    style = MaterialTheme.typography.labelSmall.copy(
+                                        fontSize = 10.5.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (isDark) Color(0xFFEDE9FE) else Color(0xFF3730A3)
+                                    ),
+                                    modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp)
+                                )
+                            }
+                        }
                     }
                 }
 

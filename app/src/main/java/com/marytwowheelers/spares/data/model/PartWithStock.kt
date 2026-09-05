@@ -11,7 +11,7 @@ data class PartWithStock(
 val PartWithStock.stockState: StockState
     get() = when {
         currentStock <= 0 -> StockState.OUT
-        currentStock <= 5 -> StockState.LOW
+        currentStock <= 3 -> StockState.LOW
         else -> StockState.HEALTHY
     }
 

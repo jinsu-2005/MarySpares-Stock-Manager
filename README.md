@@ -1,4 +1,4 @@
-﻿# 🏍️ Mary Spares — Store Stock Manager
+# 🏍️ Mary Spares — Store Stock Manager
 
 > **Modern, offline-first inventory & spare parts management system built exclusively for Mary Two Wheelers Spares store.**
 
@@ -32,7 +32,7 @@ Download the latest production release directly from GitHub:
 | 📦 **Smart Inventory Tracking** | Auto-assigned continuous serials (`#1`, `#2`...), custom part numbers, shelf/rack locations, and Rupee pricing (Selling Price & MRP). |
 | ⚡ **Offline-First Architecture** | High-speed local Room SQLite caching. Full app functionality available offline with zero latency. |
 | 🔄 **Firebase Cloud Sync** | Seamless two-way background sync with Cloud Firestore. Queues offline actions and uploads automatically when online. |
-| 🔔 **Stock Alerts & Review Badge** | Instant alerts for low stock (≤ 5 units) and out-of-stock (0 units) with filter tabs and quick one-tap restock actions. |
+| 🔔 **Stock Alerts & Review Badge** | Instant alerts for low stock (≤ 3 units) and out-of-stock (0 units) with filter tabs and quick one-tap restock actions. |
 | 📜 **Audit History & Logs** | Complete transaction logging for all inward additions, stock adjustments, and sales with customizable retention pruning. |
 | 👥 **Role-Based Access Control** | Secure Google & Email authentication with 4 clearly defined user roles and strict permission enforcement per role. |
 | 💾 **SAF Backups & CSV Export** | Export store inventory directly to CSV or create complete 4-collection database `.zip` backups to any user-chosen folder (Downloads, Drive, SD card). |

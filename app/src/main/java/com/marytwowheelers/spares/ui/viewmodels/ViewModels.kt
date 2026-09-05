@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.marytwowheelers.spares.data.local.MovementType
 import com.marytwowheelers.spares.data.local.StockAlertManager
@@ -424,34 +425,51 @@ class SettingsViewModel(
                 onProgress("Backup verified. Deleting Firestore cloud collections...")
                 kotlinx.coroutines.delay(400)
 
-                // Delete all documents in parts
-                for (doc in partsSnap.documents) {
-                    doc.reference.delete().await()
+                val auth = FirebaseAuth.getInstance()
+                val currentUid = auth.currentUser?.uid
+                val currentEmail = auth.currentUser?.email?.lowercase()?.trim()
+
+                // Helper to delete a list of document references using batched writes
+                suspend fun deleteInBatches(docs: List<com.google.firebase.firestore.DocumentSnapshot>) {
+                    val batchLimit = 400
+                    for (chunk in docs.chunked(batchLimit)) {
+                        val batch = firestore.batch()
+                        for (doc in chunk) {
+                            batch.delete(doc.reference)
+                        }
+                        batch.commit().await()
+                    }
                 }
 
-                // Delete all documents in movements
-                for (doc in movementsSnap.documents) {
-                    doc.reference.delete().await()
-                }
+                // 1. Delete all parts documents in batches
+                deleteInBatches(partsSnap.documents)
 
-                // Delete all documents in users
-                for (doc in usersSnap.documents) {
-                    doc.reference.delete().await()
-                }
+                // 2. Delete all movements documents in batches
+                deleteInBatches(movementsSnap.documents)
 
-                // Delete all documents in invitations (except we will recreate the 2 root accounts)
-                for (doc in invitesSnap.documents) {
-                    doc.reference.delete().await()
+                // 3. Delete other users documents, preserving the current active admin's user doc
+                val usersToDelete = usersSnap.documents.filter { doc ->
+                    val uid = doc.id
+                    val email = doc.getString("email")?.lowercase()?.trim()
+                    uid != currentUid && email != "jinsu.j2005@gmail.com"
                 }
+                deleteInBatches(usersToDelete)
+
+                // 4. Delete invitations, keeping root admin (and current admin) intact
+                val invitesToDelete = invitesSnap.documents.filter { doc ->
+                    val email = doc.id.lowercase().trim()
+                    email != "jinsu.j2005@gmail.com" && email != currentEmail
+                }
+                deleteInBatches(invitesToDelete)
 
                 onProgress("Wiping local database cache & resetting alert indices...")
                 kotlinx.coroutines.delay(400)
                 repository.resetLocalData(autoResync = false)
                 StockAlertManager.clearAllReviewed(context)
 
-                onProgress("Re-bootstrapping initial Admin & Owner accounts...")
+                onProgress("Re-bootstrapping initial Admin account...")
                 kotlinx.coroutines.delay(400)
-                // Bootstrap Admin
+                // Bootstrap Root Admin
                 firestore.collection("invitations").document("jinsu.j2005@gmail.com").set(
                     hashMapOf(
                         "email" to "jinsu.j2005@gmail.com",

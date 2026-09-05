@@ -45,7 +45,7 @@ service cloud.firestore {
     match /invitations/{email} {
       allow read: if isAuth();
       allow create, update: if isOwnerOrAdmin();
-      allow delete: if isOwnerOrAdmin() && userEmail() != email.lower();
+      allow delete: if isRootAdmin() || (isAdmin() && email.lower() != 'jinsu.j2005@gmail.com') || (isOwnerOrAdmin() && userEmail() != email.lower() && email.lower() != 'jinsu.j2005@gmail.com');
     }
 
     // 2. User Profiles & Role Bindings

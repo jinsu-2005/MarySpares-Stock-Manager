@@ -659,7 +659,7 @@ fun DashboardScreen(
                                     text = when {
                                         outOfStockCount > 0 && lowStockCount > 0 -> "$outOfStockCount out of stock · $lowStockCount low quantity"
                                         outOfStockCount > 0 -> "$outOfStockCount items empty · Tap to restock"
-                                        else -> "$unreviewedAlertCount parts have low stock (≤5 units)"
+                                        else -> "$unreviewedAlertCount parts have low stock (≤3 units)"
                                     },
                                     style = MaterialTheme.typography.bodySmall.copy(
                                         fontSize = 11.5.sp,
@@ -711,7 +711,9 @@ fun DashboardScreen(
 
     // 1. Add Part Dialog
     if (showAddPartDialog && currentUserRole.canAddParts) {
+        val nextSerialNumber = (partsList.maxOfOrNull { it.part.serialNumber } ?: 0L) + 1L
         AddPartDialog(
+            nextSerialNumber = nextSerialNumber,
             onDismiss = { showAddPartDialog = false },
             onConfirm = { name, partNumber, shelf, sp, mrp, stock ->
                 viewModel.addPart(name, partNumber, shelf, sp, mrp, stock)
@@ -1060,7 +1062,7 @@ private fun SelectPartDialog(
                     ) {
                         items(filtered, key = { it.part.id }) { part ->
                             val isOut = part.currentStock <= 0
-                            val isLow = part.currentStock in 1..5
+                            val isLow = part.currentStock in 1..3
 
                             Card(
                                 modifier = Modifier
