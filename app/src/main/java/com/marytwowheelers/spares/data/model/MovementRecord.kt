@@ -15,5 +15,6 @@ data class MovementRecord(
     val syncState: SyncState,
     val partName: String?,
     val partNumber: String?,
-    val serialNumber: Long?
+    val serialNumber: Long?,
+    val isPartDeleted: Boolean? = false
 )

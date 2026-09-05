@@ -19,7 +19,8 @@ interface MovementDao {
 
     @Query("""
         SELECT m.id, m.partId, m.delta, m.type, m.reason, m.snapshotCount, m.previousRecordedStock, m.timestamp, m.syncState,
-               p.name AS partName, p.partNumber AS partNumber, p.serialNumber AS serialNumber
+               p.name AS partName, p.partNumber AS partNumber, p.serialNumber AS serialNumber,
+               COALESCE(p.isDeleted, 1) AS isPartDeleted
         FROM movements m
         LEFT JOIN parts p ON m.partId = p.id
         ORDER BY m.timestamp DESC

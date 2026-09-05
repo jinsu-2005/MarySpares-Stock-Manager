@@ -64,6 +64,7 @@ fun PartDetailsScreen(
     var activeActionType  by remember { mutableStateOf<MovementType?>(null) }
     var showEditDialog    by remember { mutableStateOf(false) }
     var showDeleteConfirm by remember { mutableStateOf(false) }
+    var showRestoreConfirm by remember { mutableStateOf(false) }
 
     val cs = MaterialTheme.colorScheme
     val isDark = cs.background.red < 0.5f
@@ -127,25 +128,39 @@ fun PartDetailsScreen(
                             onClick = { viewModel.triggerSync() }
                         )
 
-                        // Edit Part Button (Only Owner / Admin)
-                        if (currentUserRole.canEditParts) {
-                            IconButton(onClick = { showEditDialog = true }) {
-                                Icon(
-                                    imageVector = Icons.Outlined.Edit,
-                                    contentDescription = "Edit Part",
-                                    tint = if (isDark) Color(0xFFC4B5FD) else Color(0xFF5046E5)
-                                )
+                        val isPartDeleted = partWithStock?.part?.isDeleted == true
+                        if (isPartDeleted) {
+                            // Restore Part Button (Only Owner / Admin)
+                            if (currentUserRole.canDeleteParts) {
+                                IconButton(onClick = { showRestoreConfirm = true }) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.RestoreFromTrash,
+                                        contentDescription = "Restore Part",
+                                        tint = if (isDark) Color(0xFF34D399) else Color(0xFF059669)
+                                    )
+                                }
                             }
-                        }
+                        } else {
+                            // Edit Part Button (Only Owner / Admin)
+                            if (currentUserRole.canEditParts) {
+                                IconButton(onClick = { showEditDialog = true }) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.Edit,
+                                        contentDescription = "Edit Part",
+                                        tint = if (isDark) Color(0xFFC4B5FD) else Color(0xFF5046E5)
+                                    )
+                                }
+                            }
 
-                        // Delete / Archive Button (Only Owner / Admin)
-                        if (currentUserRole.canDeleteParts) {
-                            IconButton(onClick = { showDeleteConfirm = true }) {
-                                Icon(
-                                    imageVector = Icons.Outlined.DeleteOutline,
-                                    contentDescription = "Delete Part",
-                                    tint = if (isDark) Color(0xFFFCA5A5) else Color(0xFFEF4444)
-                                )
+                            // Delete / Archive Button (Only Owner / Admin)
+                            if (currentUserRole.canDeleteParts) {
+                                IconButton(onClick = { showDeleteConfirm = true }) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.DeleteOutline,
+                                        contentDescription = "Delete Part",
+                                        tint = if (isDark) Color(0xFFFCA5A5) else Color(0xFFEF4444)
+                                    )
+                                }
                             }
                         }
                     }
@@ -168,8 +183,15 @@ fun PartDetailsScreen(
             val isOut = stock <= 0
             val isLow = stock in 1..3
 
+            val isPartDeleted = p.part.isDeleted
             // Status Colors & Badges
             val (statusText, statusBadgeBg, statusBadgeTint, statusIcon) = when {
+                isPartDeleted -> Quadruple(
+                    "DELETED",
+                    if (isDark) Color(0xFF38151D) else Color(0xFFFEE2E2),
+                    if (isDark) Color(0xFFFF4D6D) else Color(0xFFDC2626),
+                    Icons.Outlined.DeleteForever
+                )
                 isOut -> Quadruple(
                     "OUT OF STOCK",
                     if (isDark) Color(0xFF3E1824) else Color(0xFFFEE2E2),
@@ -476,7 +498,11 @@ fun PartDetailsScreen(
                 // ─────────────────────────────────────────────
                 item {
                     Text(
-                        text = if (currentUserRole.isReadOnly) "Stock Permissions" else "Stock Actions",
+                        text = when {
+                            isPartDeleted -> "Item Status"
+                            currentUserRole.isReadOnly -> "Stock Permissions"
+                            else -> "Stock Actions"
+                        },
                         style = MaterialTheme.typography.titleSmall.copy(
                             fontWeight = FontWeight.Bold,
                             fontSize = 15.sp,
@@ -487,7 +513,55 @@ fun PartDetailsScreen(
                 }
 
                 item {
-                    if (currentUserRole.isReadOnly) {
+                    if (isPartDeleted) {
+                        Surface(
+                            shape = RoundedCornerShape(16.dp),
+                            color = if (isDark) Color(0xFF26151B) else Color(0xFFFFF1F2),
+                            border = BorderStroke(1.dp, if (isDark) Color(0xFF882336) else Color(0xFFFCA5A5)),
+                            modifier = Modifier.fillMaxWidth()
+                        ) {
+                            Row(
+                                modifier = Modifier.padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(14.dp)
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(42.dp)
+                                        .background(
+                                            color = if (isDark) Color(0xFF4C1D24) else Color(0xFFFEE2E2),
+                                            shape = CircleShape
+                                        ),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Outlined.DeleteForever,
+                                        contentDescription = null,
+                                        tint = if (isDark) Color(0xFFFF4D6D) else Color(0xFFDC2626),
+                                        modifier = Modifier.size(22.dp)
+                                    )
+                                }
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = "Spare Part Deleted (Archived)",
+                                        style = MaterialTheme.typography.bodyMedium.copy(
+                                            fontWeight = FontWeight.Bold,
+                                            color = if (isDark) Color(0xFFFF4D6D) else Color(0xFFDC2626)
+                                        )
+                                    )
+                                    Spacer(Modifier.height(3.dp))
+                                    Text(
+                                        text = "This item has been removed from active inventory. It is retained strictly in read-only mode for historical audit logs. All stock additions, sales, and corrections are blocked.",
+                                        style = MaterialTheme.typography.bodySmall.copy(
+                                            color = if (isDark) Color(0xFFFCA5A5) else Color(0xFF991B1B),
+                                            fontSize = 12.sp,
+                                            lineHeight = 16.sp
+                                        )
+                                    )
+                                }
+                            }
+                        }
+                    } else if (currentUserRole.isReadOnly) {
                         Surface(
                             shape = RoundedCornerShape(16.dp),
                             color = cardBg,
@@ -774,6 +848,56 @@ fun PartDetailsScreen(
             },
             dismissButton = {
                 TextButton(onClick = { showDeleteConfirm = false }) {
+                    Text("Cancel", color = secondaryText)
+                }
+            },
+            containerColor = cardBg,
+            shape = RoundedCornerShape(20.dp)
+        )
+    }
+
+    if (showRestoreConfirm) {
+        AlertDialog(
+            onDismissRequest = { showRestoreConfirm = false },
+            modifier = Modifier.border(BorderStroke(1.dp, if (isDark) Color(0xFF424A63) else Color(0xFFEEF0FA)), RoundedCornerShape(20.dp)),
+            title = {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.RestoreFromTrash,
+                        contentDescription = null,
+                        tint = if (isDark) Color(0xFF34D399) else Color(0xFF059669)
+                    )
+                    Text("Restore Spare Part?", fontWeight = FontWeight.Bold)
+                }
+            },
+            text = {
+                Text(
+                    text = "Do you want to restore '${partWithStock?.part?.name}' back to active inventory? It will immediately reappear in the inventory catalog.",
+                    style = MaterialTheme.typography.bodyMedium.copy(color = secondaryText)
+                )
+            },
+            confirmButton = {
+                Button(
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (isDark) Color(0xFF059669) else Color(0xFF10B981),
+                        contentColor = Color.White
+                    ),
+                    onClick = {
+                        showRestoreConfirm = false
+                        viewModel.restorePart(onRestored = {
+                            scope.launch { snackbarHostState.showSnackbar("Restored '${partWithStock?.part?.name}' to active catalog.") }
+                        })
+                    },
+                    shape = RoundedCornerShape(10.dp)
+                ) {
+                    Text("Restore Part", fontWeight = FontWeight.Bold)
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showRestoreConfirm = false }) {
                     Text("Cancel", color = secondaryText)
                 }
             },

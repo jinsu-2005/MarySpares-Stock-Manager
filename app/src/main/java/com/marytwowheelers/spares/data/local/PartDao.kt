@@ -49,6 +49,13 @@ interface PartDao {
         syncState: SyncState
     ): Int
 
+    @Query("UPDATE parts SET isDeleted = 0, updatedAt = :updatedAt, syncState = :syncState WHERE id = :partId")
+    suspend fun restorePart(
+        partId: String,
+        updatedAt: Long,
+        syncState: SyncState
+    ): Int
+
     @Query("SELECT MAX(serialNumber) FROM parts WHERE isDeleted = 0")
     suspend fun getMaxSerialNumber(): Long?
 

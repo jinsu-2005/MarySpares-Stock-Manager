@@ -234,6 +234,15 @@ class PartDetailsViewModel(
             onDeleted()
         }
     }
+
+    fun restorePart(onRestored: () -> Unit) {
+        if (!currentUserRole.value.canDeleteParts) return
+        val id = _partId.value ?: return
+        viewModelScope.launch {
+            repository.restorePart(id)
+            onRestored()
+        }
+    }
 }
 
 class HistoryViewModel(private val repository: InventoryRepository) : ViewModel() {

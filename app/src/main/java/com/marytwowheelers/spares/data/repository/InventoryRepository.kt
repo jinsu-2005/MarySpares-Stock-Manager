@@ -1,6 +1,7 @@
 package com.marytwowheelers.spares.data.repository
 
 import android.content.Context
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.marytwowheelers.spares.data.local.AppDatabase
@@ -163,6 +164,11 @@ class InventoryRepository(private val context: Context) {
         mrpPaise: Long
     ) {
         withContext(Dispatchers.IO) {
+            val part = partDao.getPartById(partId)
+            if (part == null || part.isDeleted) {
+                Log.w("InventoryRepository", "Cannot update metadata for deleted part $partId")
+                return@withContext
+            }
             val now = System.currentTimeMillis()
             partDao.updatePartMetadata(
                 partId = partId,
@@ -183,6 +189,11 @@ class InventoryRepository(private val context: Context) {
      */
     suspend fun recordMovement(partId: String, delta: Int, type: MovementType, reason: String?) {
         withContext(Dispatchers.IO) {
+            val part = partDao.getPartById(partId)
+            if (part == null || part.isDeleted) {
+                Log.w("InventoryRepository", "Cannot record movement for deleted part $partId")
+                return@withContext
+            }
             val currentStock = partDao.calculateStockForPart(partId)
             val movement = MovementEntity(
                 partId = partId,
@@ -208,6 +219,11 @@ class InventoryRepository(private val context: Context) {
      */
     suspend fun recordAdjustment(partId: String, targetPhysicalCount: Int, reason: String?) {
         withContext(Dispatchers.IO) {
+            val part = partDao.getPartById(partId)
+            if (part == null || part.isDeleted) {
+                Log.w("InventoryRepository", "Cannot record adjustment for deleted part $partId")
+                return@withContext
+            }
             val currentStock = partDao.calculateStockForPart(partId)
             val delta = targetPhysicalCount - currentStock
             val movement = MovementEntity(
@@ -228,6 +244,17 @@ class InventoryRepository(private val context: Context) {
     suspend fun deletePart(partId: String) {
         withContext(Dispatchers.IO) {
             partDao.softDeletePart(
+                partId = partId,
+                updatedAt = System.currentTimeMillis(),
+                syncState = SyncState.PENDING
+            )
+            SyncManager.enqueueSync(context)
+        }
+    }
+
+    suspend fun restorePart(partId: String) {
+        withContext(Dispatchers.IO) {
+            partDao.restorePart(
                 partId = partId,
                 updatedAt = System.currentTimeMillis(),
                 syncState = SyncState.PENDING

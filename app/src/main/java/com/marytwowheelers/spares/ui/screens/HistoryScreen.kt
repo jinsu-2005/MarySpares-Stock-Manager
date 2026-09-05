@@ -413,6 +413,25 @@ fun HistoryMovementCard(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
+
+                    // Deleted badge if part is deleted
+                    if (record.isPartDeleted == true) {
+                        Surface(
+                            shape = RoundedCornerShape(5.dp),
+                            color = if (isDark) Color(0xFF38151D) else Color(0xFFFEE2E2),
+                            border = BorderStroke(0.5.dp, if (isDark) Color(0xFF882336) else Color(0xFFFCA5A5))
+                        ) {
+                            Text(
+                                text = "Deleted",
+                                style = MaterialTheme.typography.labelSmall.copy(
+                                    fontSize = 9.5.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = if (isDark) Color(0xFFFF4D6D) else Color(0xFFDC2626)
+                                ),
+                                modifier = Modifier.padding(horizontal = 5.dp, vertical = 1.dp)
+                            )
+                        }
+                    }
                 }
 
                 // Exact Timestamp
