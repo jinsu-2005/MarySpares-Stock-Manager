@@ -178,9 +178,22 @@ fun SettingsScreen(
         mutableStateOf(SimpleDateFormat("dd MMM, hh:mm a", Locale.US).format(Date()))
     }
 
-    // Clear History State
-    var selectedRetentionPeriod by remember { mutableStateOf(HistoryRetentionPeriod.NINETY_DAYS) }
-    var customDaysInput by remember { mutableStateOf("30") }
+    // Clear History State (Persisted in SharedPreferences)
+    val historyPrefs = remember {
+        context.getSharedPreferences("history_retention_prefs", Context.MODE_PRIVATE)
+    }
+    var selectedRetentionPeriod by remember {
+        val savedName = historyPrefs.getString("selected_retention_period", HistoryRetentionPeriod.NINETY_DAYS.name)
+        val period = try {
+            HistoryRetentionPeriod.valueOf(savedName ?: HistoryRetentionPeriod.NINETY_DAYS.name)
+        } catch (e: Exception) {
+            HistoryRetentionPeriod.NINETY_DAYS
+        }
+        mutableStateOf(period)
+    }
+    var customDaysInput by remember {
+        mutableStateOf(historyPrefs.getString("custom_retention_days", "30") ?: "30")
+    }
     val customDays = if (selectedRetentionPeriod == HistoryRetentionPeriod.CUSTOM) customDaysInput.toIntOrNull() else null
     var matchingHistoryCount by remember { mutableStateOf(0) }
     var showClearHistoryDialog by remember { mutableStateOf(false) }
@@ -1014,6 +1027,7 @@ fun SettingsScreen(
                                                 },
                                                 onClick = {
                                                     selectedRetentionPeriod = period
+                                                    historyPrefs.edit().putString("selected_retention_period", period.name).apply()
                                                     isDropdownExpanded = false
                                                     if (period == HistoryRetentionPeriod.CUSTOM) {
                                                         showCustomDaysDialog = true
@@ -2074,6 +2088,10 @@ fun SettingsScreen(
                         if (isValid) {
                             customDaysInput = tempDaysInput
                             selectedRetentionPeriod = HistoryRetentionPeriod.CUSTOM
+                            historyPrefs.edit()
+                                .putString("selected_retention_period", HistoryRetentionPeriod.CUSTOM.name)
+                                .putString("custom_retention_days", tempDaysInput)
+                                .apply()
                             showCustomDaysDialog = false
                         }
                     },

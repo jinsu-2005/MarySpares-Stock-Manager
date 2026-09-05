@@ -7,7 +7,7 @@ plugins {
 
 val gitCommitCount = providers.exec {
     commandLine("git", "rev-list", "--count", "HEAD")
-}.standardOutput.asText.map { it.trim().toIntOrNull() ?: 25 }.getOrElse(25)
+}.standardOutput.asText.map { it.trim().toIntOrNull() ?: 29 }.getOrElse(29)
 
 android {
     namespace = "com.marytwowheelers.spares"
@@ -20,7 +20,7 @@ android {
         minSdk = 24
         targetSdk = 37
         versionCode = gitCommitCount
-        versionName = "1.0.4"
+        versionName = "1.0.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

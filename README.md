@@ -14,11 +14,11 @@
 
 Download the latest production release directly from GitHub:
 
-- 🏷️ **Latest Release**: [**Download MarySpares-v1.0.4.apk (v1.0.4)**](https://github.com/jinsu-2005/MarySpares-Stock-Manager/releases/tag/v1.0.4)
+- 🏷️ **Latest Release**: [**Download MarySpares-v1.0.5.apk (v1.0.5)**](https://github.com/jinsu-2005/MarySpares-Stock-Manager/releases/tag/v1.0.5)
 - 📦 **All Releases**: [GitHub Releases Page](https://github.com/jinsu-2005/MarySpares-Stock-Manager/releases)
 
 ### How to Install on Android:
-1. Download **`MarySpares-v1.0.4.apk`** to your phone.
+1. Download **`MarySpares-v1.0.5.apk`** to your phone.
 2. Tap the downloaded file in your notification bar or file manager.
 3. If prompted, allow *"Install from unknown sources"* or *"Allow from this source"*.
 4. Tap **Install** and open the app!
